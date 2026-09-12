@@ -50,7 +50,7 @@
 
     <section class="panel device-panel">
       <div class="panel-head">
-        <div><h2>设备列表</h2><p>点击设备可查看详情</p></div>
+        <div><h2>设备列表</h2><p>点击设备可查看详情并执行操作</p></div>
         <span class="panel-badge">最多显示 200 台</span>
       </div>
       <div class="toolbar">
@@ -85,7 +85,22 @@
         <div><span>温度</span><strong id="modal-temperature">--</strong></div>
         <div><span>最后上报</span><strong id="modal-last-seen">--</strong></div>
       </div>
+
+      <div id="offline-reason" class="reason-box hidden">
+        <div class="reason-title">离线原因分析</div>
+        <strong id="reason-main">--</strong>
+        <p id="reason-detail">--</p>
+      </div>
+
+      <div class="action-row">
+        <button id="reconnect-btn" class="action primary">重新连接</button>
+        <button id="restart-btn" class="action">重启设备</button>
+        <button id="history-btn" class="action">查看历史数据</button>
+      </div>
+      <div id="action-message" class="action-message"></div>
+
       <div class="trend"><span>近 8 次温度趋势</span><div id="trend-bars" class="trend-bars"></div></div>
+      <div id="history-panel" class="history-panel hidden"></div>
     </div>
   </div>
 
