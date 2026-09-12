@@ -98,7 +98,7 @@ function renderTable() {
     return matchesKeyword && matchesStatus;
   });
   list.innerHTML = filtered.slice(0, 200).map(device => `
-    <tr data-id="${device.id}">
+    <tr data-id="${device.id}" tabindex="0">
       <td><div class="device-name">${device.name}</div><div class="device-id">${device.id} · ${device.zone}</div></td>
       <td><span class="badge ${device.status}">${statusText[device.status]}</span></td>
       <td>${device.signal}</td>
@@ -106,7 +106,15 @@ function renderTable() {
       <td>${formatLastSeen(device.minutesSinceSeen)}${device.status === "offline" && device.minutesSinceSeen > 10 ? " ⚠️ 超时" : ""}</td>
     </tr>
   `).join("") || `<tr><td colspan="5">没有找到匹配设备</td></tr>`;
-  list.querySelectorAll("tr[data-id]").forEach(row => row.addEventListener("click", () => openDetail(row.dataset.id)));
+  list.querySelectorAll("tr[data-id]").forEach(row => {
+    row.addEventListener("click", () => openDetail(row.dataset.id));
+    row.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        openDetail(row.dataset.id);
+      }
+    });
+  });
 }
 
 function renderHistory(device) {
@@ -138,10 +146,9 @@ function openDetail(id) {
 
   actionMessage.textContent = "";
   historyPanel.classList.add("hidden");
-  const base = device.temperature === "--" ? 27 : parseFloat(device.temperature);
-  document.querySelector("#trend-bars").innerHTML = Array.from({ length: 8 }, (_, i) => {
-    const value = device.history[i].temperature === null ? 55 : Math.max(25, Math.min(90, 45 + device.history[i].temperature));
-    return `<div class="trend-bar" style="height:${value}%" title="${device.history[i].temperature === null ? "无温度数据" : `${device.history[i].temperature}°C`}"></div>`;
+  document.querySelector("#trend-bars").innerHTML = device.history.map(item => {
+    const value = item.temperature === null ? 55 : Math.max(25, Math.min(90, 45 + item.temperature));
+    return `<div class="trend-bar" style="height:${value}%" title="${item.temperature === null ? "无温度数据" : `${item.temperature}°C`}"></div>`;
   }).join("");
   modal.classList.remove("hidden");
 }
@@ -157,15 +164,10 @@ function simulateReconnect() {
   }
   actionMessage.textContent = "正在重新连接……";
   setTimeout(() => {
-    const success = device.id.charCodeAt(device.id.length - 1) % 2 === 0;
-    if (success) {
-      device.status = "online";
-      device.signal = "一般";
-      device.minutesSinceSeen = 0;
-      actionMessage.textContent = "✅ 重新连接成功，设备已恢复在线。";
-    } else {
-      actionMessage.textContent = "⚠️ 重新连接失败，建议检查现场网络或网关。";
-    }
+    device.status = "online";
+    device.signal = "一般";
+    device.minutesSinceSeen = 0;
+    actionMessage.textContent = "✅ 重新连接成功，设备已恢复在线。";
     renderSummary(); renderAlerts(); renderTable(); renderMap(); openDetail(device.id);
   }, 700);
 }
@@ -177,8 +179,11 @@ function simulateRestart() {
   setTimeout(() => {
     device.restartCount += 1;
     device.minutesSinceSeen = 0;
-    device.signal = device.status === "offline" ? "一般" : device.signal;
-    actionMessage.textContent = `✅ 重启指令已完成（第 ${device.restartCount} 次）。真实系统这里会调用设备控制 API。`;
+    if (device.status === "offline") {
+      device.status = "online";
+      device.signal = "一般";
+    }
+    actionMessage.textContent = `✅ 重启完成，第 ${device.restartCount} 次重启，设备已恢复。`;
     renderSummary(); renderAlerts(); renderTable(); renderMap(); openDetail(device.id);
   }, 700);
 }
