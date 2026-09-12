@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IoT 设备监控台</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <div>
+        <p class="eyebrow">IoT MONITOR</p>
+        <h1>设备在线状态</h1>
+        <p class="subtitle">IoT 设备监控网页演示</p>
+      </div>
+      <div class="updated">最后刷新：<span id="last-updated">--</span></div>
+    </header>
+
+    <section class="summary">
+      <div class="card"><span>全部设备</span><strong id="total">0</strong></div>
+      <div class="card online"><span>在线</span><strong id="online">0</strong></div>
+      <div class="card offline"><span>离线</span><strong id="offline">0</strong></div>
+      <div class="card warning"><span>异常</span><strong id="warning">0</strong></div>
+    </section>
+
+    <section class="toolbar">
+      <input id="search" type="search" placeholder="搜索设备名称或编号" />
+      <select id="status-filter">
+        <option value="all">全部状态</option>
+        <option value="online">在线</option>
+        <option value="offline">离线</option>
+        <option value="warning">异常</option>
+      </select>
+    </section>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>设备</th><th>状态</th><th>信号</th><th>温度</th><th>最后上报</th></tr>
+        </thead>
+        <tbody id="device-list"></tbody>
+      </table>
+    </section>
+
+    <p class="note">当前使用 1000 台模拟设备数据。后续可接入 MQTT、HTTP API 或真实 IoT 平台。</p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
