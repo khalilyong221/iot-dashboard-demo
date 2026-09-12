@@ -3,48 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IoT 设备监控台</title>
+  <title>IoT 设备监控中心</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <main class="container">
     <header class="header">
       <div>
-        <p class="eyebrow">IoT MONITOR</p>
-        <h1>设备在线状态</h1>
-        <p class="subtitle">IoT 设备监控网页演示</p>
+        <p class="eyebrow">IOT MONITORING CENTER</p>
+        <h1>IoT 设备监控中心</h1>
+        <p class="subtitle">实时掌握设备在线状态、告警与运行概况</p>
       </div>
-      <div class="updated">最后刷新：<span id="last-updated">--</span></div>
+      <div class="header-right">
+        <span class="live-dot"></span><span>演示环境</span>
+        <span class="updated">最后刷新：<b id="last-updated">--</b></span>
+      </div>
     </header>
 
     <section class="summary">
-      <div class="card"><span>全部设备</span><strong id="total">0</strong></div>
-      <div class="card online"><span>在线</span><strong id="online">0</strong></div>
-      <div class="card offline"><span>离线</span><strong id="offline">0</strong></div>
-      <div class="card warning"><span>异常</span><strong id="warning">0</strong></div>
+      <div class="card"><span>全部设备</span><strong id="total">0</strong><small>设备总量</small></div>
+      <div class="card online"><span>在线</span><strong id="online">0</strong><small id="online-rate">--% 在线率</small></div>
+      <div class="card offline"><span>离线</span><strong id="offline">0</strong><small>需要关注</small></div>
+      <div class="card warning"><span>异常</span><strong id="warning">0</strong><small>需要处理</small></div>
+      <div class="card alert"><span>超时告警</span><strong id="timeout">0</strong><small>离线超过 10 分钟</small></div>
     </section>
 
-    <section class="toolbar">
-      <input id="search" type="search" placeholder="搜索设备名称或编号" />
-      <select id="status-filter">
-        <option value="all">全部状态</option>
-        <option value="online">在线</option>
-        <option value="offline">离线</option>
-        <option value="warning">异常</option>
-      </select>
+    <section class="dashboard-grid">
+      <div class="panel map-panel">
+        <div class="panel-head">
+          <div><h2>设备分布</h2><p>模拟园区 / 厂区设备位置</p></div>
+          <span class="panel-badge">1000 台</span>
+        </div>
+        <div id="device-map" class="device-map"></div>
+        <div class="legend">
+          <span><i class="dot online-dot"></i>在线</span>
+          <span><i class="dot warning-dot"></i>异常</span>
+          <span><i class="dot offline-dot"></i>离线</span>
+        </div>
+      </div>
+
+      <div class="panel alert-panel">
+        <div class="panel-head"><div><h2>重点告警</h2><p>最近需要处理的设备</p></div></div>
+        <div id="alerts" class="alerts"></div>
+      </div>
     </section>
 
-    <section class="table-wrap">
-      <table>
-        <thead>
-          <tr><th>设备</th><th>状态</th><th>信号</th><th>温度</th><th>最后上报</th></tr>
-        </thead>
-        <tbody id="device-list"></tbody>
-      </table>
+    <section class="panel device-panel">
+      <div class="panel-head">
+        <div><h2>设备列表</h2><p>点击设备可查看详情</p></div>
+        <span class="panel-badge">最多显示 200 台</span>
+      </div>
+      <div class="toolbar">
+        <input id="search" type="search" placeholder="搜索设备名称或编号" />
+        <select id="status-filter">
+          <option value="all">全部状态</option>
+          <option value="online">在线</option>
+          <option value="offline">离线</option>
+          <option value="warning">异常</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>设备</th><th>状态</th><th>信号</th><th>温度</th><th>最后上报</th></tr></thead>
+          <tbody id="device-list"></tbody>
+        </table>
+      </div>
     </section>
 
-    <p class="note">当前使用 1000 台模拟设备数据。后续可接入 MQTT、HTTP API 或真实 IoT 平台。</p>
+    <p class="note">演示数据仅用于展示界面与业务逻辑。后续可以接入 MQTT、HTTP API、数据库和真实设备。</p>
   </main>
+
+  <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button id="close-modal" class="close" aria-label="关闭">×</button>
+      <p class="eyebrow">DEVICE DETAIL</p>
+      <h2 id="modal-name">设备</h2>
+      <p id="modal-id" class="modal-id"></p>
+      <div class="detail-grid">
+        <div><span>状态</span><strong id="modal-status">--</strong></div>
+        <div><span>信号</span><strong id="modal-signal">--</strong></div>
+        <div><span>温度</span><strong id="modal-temperature">--</strong></div>
+        <div><span>最后上报</span><strong id="modal-last-seen">--</strong></div>
+      </div>
+      <div class="trend"><span>近 8 次温度趋势</span><div id="trend-bars" class="trend-bars"></div></div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>
