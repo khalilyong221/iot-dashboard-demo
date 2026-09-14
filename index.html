@@ -1,96 +1,13 @@
 <!doctype html>
 <html lang="zh-CN">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#07111f" />
-  <title>IoT Control Center</title>
-  <link rel="stylesheet" href="style.css" />
-</head>
+<head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/><meta name="theme-color" content="#07111f"/><title>IoT Control Center</title><link rel="stylesheet" href="style.css"/></head>
 <body>
-  <div class="shell">
-    <aside class="sidebar">
-      <div class="brand">
-        <div class="brand-mark">IO</div>
-        <div><strong>IoT CONTROL</strong><span>OPERATIONS CENTER</span></div>
-      </div>
-      <nav class="nav">
-        <a class="nav-item active" href="#overview"><span>▦</span>总览</a>
-        <a class="nav-item" href="#devices"><span>◉</span>设备</a>
-        <a class="nav-item" href="#alerts-section"><span>!</span>告警 <b id="nav-alert-count">0</b></a>
-        <a class="nav-item" href="#telemetry"><span>⌁</span>遥测</a>
-        <a class="nav-item" href="#map-section"><span>⌖</span>拓扑</a>
-      </nav>
-      <div class="side-status">
-        <span class="pulse"></span>
-        <div><strong>系统运行正常</strong><small>Demo Gateway · 12ms</small></div>
-      </div>
-      <div class="side-footer">v2.0 · DEMO MODE</div>
-    </aside>
-
-    <main class="main" id="overview">
-      <header class="topbar">
-        <div><p class="eyebrow">IOT / MONITORING / OVERVIEW</p><h1>设备监控中心</h1></div>
-        <div class="top-actions">
-          <span class="live"><i></i>LIVE</span>
-          <span class="clock" id="last-updated">--</span>
-          <button class="icon-btn" id="refresh-btn" title="刷新">↻</button>
-        </div>
-      </header>
-
-      <section class="metrics" aria-label="系统概览">
-        <div class="metric primary"><div><span>设备总数</span><strong id="total">0</strong></div><em>100%</em></div>
-        <div class="metric"><div><span>在线设备</span><strong id="online">0</strong><small id="online-rate">--</small></div><em class="ok">ONLINE</em></div>
-        <div class="metric"><div><span>异常设备</span><strong id="warning">0</strong></div><em class="warn">WARNING</em></div>
-        <div class="metric"><div><span>离线设备</span><strong id="offline">0</strong></div><em class="bad">OFFLINE</em></div>
-        <div class="metric"><div><span>超时告警</span><strong id="timeout">0</strong></div><em class="alarm">TIMEOUT</em></div>
-      </section>
-
-      <section class="workspace">
-        <div class="panel map-panel" id="map-section">
-          <div class="panel-head">
-            <div><p class="eyebrow">LIVE TOPOLOGY</p><h2>园区设备拓扑</h2></div>
-            <div class="map-tools"><span class="legend-chip"><i class="dot online-dot"></i>在线</span><span class="legend-chip"><i class="dot warning-dot"></i>异常</span><span class="legend-chip"><i class="dot offline-dot"></i>离线</span></div>
-          </div>
-          <div class="map-stage" id="device-map"><div class="zone-label z1">A · 温室</div><div class="zone-label z2">B · 冷库</div><div class="zone-label z3">C · 仓库</div><div class="zone-label z4">D · 泵站</div><div class="zone-label z5">E · 配电房</div></div>
-          <div class="map-footer"><span>● 5 个区域</span><span>● 1000 个逻辑设备</span><span>● 实时刷新 30s</span></div>
-        </div>
-
-        <aside class="panel alerts-panel" id="alerts-section">
-          <div class="panel-head"><div><p class="eyebrow">INCIDENTS</p><h2>实时告警</h2></div><span class="count-pill" id="alert-count">0 ACTIVE</span></div>
-          <div id="alerts" class="alerts"></div>
-          <button class="panel-link" id="show-alerts">查看全部告警 →</button>
-        </aside>
-      </section>
-
-      <section class="telemetry-row" id="telemetry">
-        <div class="panel telemetry-card"><div class="mini-head"><span>NETWORK HEALTH</span><strong id="network-health">96.2%</strong></div><div class="progress"><i id="health-bar"></i></div><div class="mini-meta"><span>Gateway 18/18</span><span>Latency 12ms</span></div></div>
-        <div class="panel telemetry-card"><div class="mini-head"><span>AVG TEMPERATURE</span><strong id="avg-temp">--</strong></div><div class="sparkline" id="sparkline"></div><div class="mini-meta"><span>近 30 分钟</span><span>采样 60s</span></div></div>
-        <div class="panel telemetry-card"><div class="mini-head"><span>DEVICE ACTIVITY</span><strong id="activity-count">1,248</strong></div><div class="activity-bars" id="activity-bars"></div><div class="mini-meta"><span>消息 / min</span><span>峰值 1,560</span></div></div>
-      </section>
-
-      <section class="panel device-panel" id="devices">
-        <div class="panel-head device-head"><div><p class="eyebrow">DEVICE INVENTORY</p><h2>设备列表</h2><span class="muted">搜索、筛选并打开设备详情</span></div><div class="device-controls"><input id="search" type="search" placeholder="搜索设备 / ID / 区域" /><select id="status-filter"><option value="all">全部状态</option><option value="online">在线</option><option value="warning">异常</option><option value="offline">离线</option></select></div></div>
-        <div class="table-wrap"><table><thead><tr><th>设备</th><th>状态</th><th>信号</th><th>温度</th><th>电量</th><th>最后上报</th><th></th></tr></thead><tbody id="device-list"></tbody></table></div>
-        <div class="table-footer"><span>显示前 <b id="shown-count">0</b> 台 · 最多 200 台</span><span>点击行查看详细遥测</span></div>
-      </section>
-
-      <footer class="footer-note">演示环境 · 数据由浏览器生成。架构预留 MQTT / WebSocket / HTTP API / 数据库接入。</footer>
-    </main>
-  </div>
-
-  <div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-card">
-      <button id="close-modal" class="close" aria-label="关闭">×</button>
-      <div class="modal-top"><div><p class="eyebrow">DEVICE DETAIL</p><h2 id="modal-name">设备</h2><p id="modal-id" class="modal-id"></p></div><span id="modal-status-badge" class="status-badge online">ONLINE</span></div>
-      <div class="hero-stats"><div><span>状态</span><strong id="modal-status">--</strong></div><div><span>信号</span><strong id="modal-signal">--</strong></div><div><span>温度</span><strong id="modal-temperature">--</strong></div><div><span>电量</span><strong id="modal-battery">--</strong></div></div>
-      <div id="offline-reason" class="reason-box hidden"><div class="reason-title">离线原因分析</div><strong id="reason-main">--</strong><p id="reason-detail">--</p></div>
-      <div class="detail-section"><div class="section-title">TEMPERATURE TREND <span>近 8 次</span></div><div id="trend-bars" class="trend-bars"></div></div>
-      <div class="detail-section"><div class="section-title">DEVICE ACTIONS</div><div class="action-row"><button id="reconnect-btn" class="action primary">↻ 重新连接</button><button id="restart-btn" class="action">⟳ 重启设备</button><button id="history-btn" class="action">◷ 历史数据</button></div><div id="action-message" class="action-message"></div></div>
-      <div id="history-panel" class="history-panel hidden"></div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-</body>
-</html>
+<div class="shell"><aside class="sidebar"><div class="brand"><div class="brand-mark">IO</div><div><strong>IoT CONTROL</strong><span>OPERATIONS CENTER</span></div></div><nav class="nav"><a class="nav-item active" href="#overview"><span>▦</span>总览</a><a class="nav-item" href="#devices"><span>◉</span>设备</a><a class="nav-item" href="#alerts-section"><span>!</span>告警 <b id="nav-alert-count">0</b></a><a class="nav-item" href="#telemetry"><span>⌁</span>遥测</a><a class="nav-item" href="#map-section"><span>⌖</span>拓扑</a></nav><div class="side-status"><span class="pulse"></span><div><strong>系统运行正常</strong><small>Demo Gateway · 12ms</small></div></div><div class="side-footer">v2.0 · SHARED MODEL</div></aside>
+<main class="main" id="overview"><header class="topbar"><div><p class="eyebrow">IOT / MONITORING / OVERVIEW</p><h1>设备监控中心</h1></div><div class="top-actions"><span class="live"><i></i>LIVE</span><span class="clock" id="last-updated">--</span><button class="icon-btn" id="refresh-btn" title="刷新">↻</button></div></header>
+<section class="metrics"><div class="metric primary"><div><span>设备总数</span><strong id="total">0</strong></div><em>100%</em></div><div class="metric"><div><span>在线设备</span><strong id="online">0</strong><small id="online-rate">--</small></div><em class="ok">ONLINE</em></div><div class="metric"><div><span>异常设备</span><strong id="warning">0</strong></div><em class="warn">WARNING</em></div><div class="metric"><div><span>离线设备</span><strong id="offline">0</strong></div><em class="bad">OFFLINE</em></div><div class="metric"><div><span>超时告警</span><strong id="timeout">0</strong></div><em class="alarm">TIMEOUT</em></div></section>
+<section class="workspace"><div class="panel map-panel" id="map-section"><div class="panel-head"><div><p class="eyebrow">LIVE TOPOLOGY</p><h2>园区设备拓扑</h2></div><div class="map-tools"><span class="legend-chip"><i class="dot online-dot"></i>在线</span><span class="legend-chip"><i class="dot warning-dot"></i>异常</span><span class="legend-chip"><i class="dot offline-dot"></i>离线</span></div></div><div class="map-stage" id="device-map"><div class="zone-label z1">A · 温室</div><div class="zone-label z2">B · 冷库</div><div class="zone-label z3">C · 仓库</div><div class="zone-label z4">D · 泵站</div><div class="zone-label z5">E · 配电房</div></div><div class="map-footer"><span>● 5 个区域</span><span>● 1000 个逻辑设备</span><span>● 共享数据模型</span></div></div><aside class="panel alerts-panel" id="alerts-section"><div class="panel-head"><div><p class="eyebrow">INCIDENTS</p><h2>实时告警</h2></div><span class="count-pill" id="alert-count">0 ACTIVE</span></div><div id="alerts" class="alerts"></div><button class="panel-link" id="show-alerts">查看全部告警 →</button></aside></section>
+<section class="telemetry-row" id="telemetry"><div class="panel telemetry-card"><div class="mini-head"><span>NETWORK HEALTH</span><strong id="network-health">--</strong></div><div class="progress"><i id="health-bar"></i></div><div class="mini-meta"><span>Gateway 18/18</span><span>Latency 12ms</span></div></div><div class="panel telemetry-card"><div class="mini-head"><span>AVG TEMPERATURE</span><strong id="avg-temp">--</strong></div><div class="sparkline" id="sparkline"></div><div class="mini-meta"><span>近 30 分钟</span><span>共享遥测</span></div></div><div class="panel telemetry-card"><div class="mini-head"><span>DEVICE ACTIVITY</span><strong id="activity-count">--</strong></div><div class="activity-bars" id="activity-bars"></div><div class="mini-meta"><span>消息 / min</span><span>模拟实时流</span></div></div></section>
+<section class="panel device-panel" id="devices"><div class="panel-head device-head"><div><p class="eyebrow">DEVICE INVENTORY</p><h2>设备列表</h2><span class="muted">搜索、筛选并打开设备详情</span></div><div class="device-controls"><input id="search" type="search" placeholder="搜索设备 / ID / 区域"/><select id="status-filter"><option value="all">全部状态</option><option value="online">在线</option><option value="warning">异常</option><option value="offline">离线</option></select></div></div><div class="table-wrap"><table><thead><tr><th>设备</th><th>状态</th><th>信号</th><th>温度</th><th>电量</th><th>最后上报</th><th></th></tr></thead><tbody id="device-list"></tbody></table></div><div class="table-footer"><span>显示前 <b id="shown-count">0</b> 台 · 最多 200 台</span><span>点击行查看详细遥测</span></div></section><footer class="footer-note">演示环境 · 管理端与用户端共享浏览器数据模型。真实版本可替换为 MQTT / WebSocket / HTTP API / 数据库。</footer></main></div>
+<div id="detail-modal" class="modal hidden" role="dialog" aria-modal="true"><div class="modal-card"><button id="close-modal" class="close" aria-label="关闭">×</button><div class="modal-top"><div><p class="eyebrow">DEVICE DETAIL</p><h2 id="modal-name">设备</h2><p id="modal-id" class="modal-id"></p></div><span id="modal-status-badge" class="status-badge online">ONLINE</span></div><div class="hero-stats"><div><span>状态</span><strong id="modal-status">--</strong></div><div><span>信号</span><strong id="modal-signal">--</strong></div><div><span>温度</span><strong id="modal-temperature">--</strong></div><div><span>电量</span><strong id="modal-battery">--</strong></div></div><div id="offline-reason" class="reason-box hidden"><div class="reason-title">离线原因分析</div><strong id="reason-main">--</strong><p id="reason-detail">--</p></div><div class="detail-section"><div class="section-title">TEMPERATURE TREND <span>近 8 次</span></div><div id="trend-bars" class="trend-bars"></div></div><div class="detail-section"><div class="section-title">DEVICE ACTIONS</div><div class="action-row"><button id="reconnect-btn" class="action primary">↻ 重新连接</button><button id="restart-btn" class="action">⟳ 重启设备</button><button id="history-btn" class="action">◷ 历史数据</button></div><div id="action-message" class="action-message"></div></div><div id="history-panel" class="history-panel hidden"></div></div></div>
+<script src="shared-data.js"></script><script src="app.js"></script>
+</body></html>
