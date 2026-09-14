@@ -1,0 +1,61 @@
+(() => {
+  const $ = (s) => document.querySelector(s);
+  const escapeHtml = (s) => String(s).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const getDevices = () => IoTShared.getFieldDevices();
+  const riskScore = d => Math.round((d.status==='offline'?48:d.status==='warning'?26:4) + Math.max(0,(-65-(d.rssi||-55))*1.4) + Math.max(0,(35-(d.temperature||26))*0.05) + ((d.restartCount||0)*4));
+  function enhanceTable(){
+    const rows = document.querySelectorAll('#device-list tr[data-id]');
+    rows.forEach(row => {
+      const d = IoTShared.getDevice(row.dataset.id); if(!d) return;
+      const cell = row.children[6]; if(!cell) return;
+      const score = riskScore(d); cell.innerHTML = `<span class="health-meter"><i style="width:${Math.max(18,100-score)}%"></i></span><b>${Math.max(0,100-score)}</b>`;
+    });
+    const fc = $('#filtered-count'); if(fc){ const kw=($('#search')?.value||'').trim().toLowerCase(), sel=$('#status-filter')?.value||'all'; fc.textContent=getDevices().filter(d=>`${d.name} ${d.id} ${d.zone} ${d.gateway}`.toLowerCase().includes(kw)&&(sel==='all'||d.status===sel)).length; }
+  }
+  function renderRisk(){
+    const box=$('#risk-ranking'); if(!box) return;
+    const list=getDevices().slice().sort((a,b)=>riskScore(b)-riskScore(a)).slice(0,5);
+    box.innerHTML=list.map((d,i)=>`<button class="risk-item" data-id="${escapeHtml(d.id)}"><span class="risk-rank">0${i+1}</span><span class="risk-main"><b>${escapeHtml(d.name)}</b><small>${escapeHtml(d.zone)} · ${escapeHtml(d.gateway||'Gateway')}</small></span><span class="risk-score">${Math.max(0,100-riskScore(d))}%</span></button>`).join('');
+    box.querySelectorAll('.risk-item').forEach(x=>x.addEventListener('click',()=>window.openDeviceDetail?.(x.dataset.id)));
+  }
+  function renderHealthChart(){
+    const box=$('#health-chart'); if(!box) return;
+    const vals=[91,93,94,92,95,96,94,97,95,96,98,97,96,98,99,97,96,95,97,98,97,99,98,98];
+    box.innerHTML=vals.map((v,i)=>`<i style="height:${v-82}px" title="${v}%"></i>`).join('');
+  }
+  function renderEnergy(){const box=$('#energy-bars'); if(box) box.innerHTML=[62,68,58,74,65,79,71,67,82,76,88,72].map(v=>`<i style="height:${v}%"></i>`).join('');}
+  function runAI(question){
+    const result=$('#ai-result'); if(!result) return;
+    const devices=getDevices();
+    const offline=devices.filter(d=>d.status==='offline');
+    const warnings=devices.filter(d=>d.status==='warning');
+    let title='运行态势分析', summary=`当前共有 ${offline.length} 台设备离线、${warnings.length} 台设备处于异常状态。`;
+    let causes=['通信质量下降','网关侧连接波动','设备自身状态异常'];
+    if(/A-1032|掉线|离线/.test(question||'')){
+      const d=devices.find(x=>x.id==='A-1032')||devices.find(x=>x.status==='offline')||devices[0];
+      title=`${d.name} · 离线根因分析`;
+      summary=`该设备最近 ${d.minutesSinceSeen||0} 分钟未上报，RSSI ${d.rssi||'--'} dBm，当前状态为${d.status==='offline'?'离线':'异常'}。`;
+      causes=[`${d.offlineReason||'无线通信质量异常'} · 72%`,`同网关设备存在相关异常 · 19%`,`设备自身故障 · 9%`];
+    } else if(/区域|网络/.test(question||'')){
+      const by={}; devices.forEach(d=>{(by[d.zone]??=[]).push(d);});
+      const ranked=Object.entries(by).map(([z,arr])=>[z,arr.filter(d=>d.status!=='online').length/arr.length]).sort((a,b)=>b[1]-a[1]);
+      title=`区域网络稳定性 · ${ranked[0]?.[0]||'A区'}`;
+      summary=`${ranked[0]?.[0]||'A区'} 当前风险率约 ${(ranked[0]?.[1]*100||0).toFixed(1)}%，建议优先排查该区域网关与无线覆盖。`;
+      causes=ranked.slice(0,3).map(([z,r])=>`${z} · 风险率 ${(r*100).toFixed(1)}%`);
+    } else if(/风险/.test(question||'')){
+      const top=devices.slice().sort((a,b)=>riskScore(b)-riskScore(a)).slice(0,3);
+      title='今日高风险设备'; summary=`已从 ${devices.length} 台设备中计算风险评分，优先关注 ${top.map(d=>d.name).join('、')}。`; causes=top.map(d=>`${d.name} · 健康度 ${Math.max(0,100-riskScore(d))}%`);
+    }
+    result.innerHTML=`<div class="ai-answer-head"><span class="ai-badge-mini">AI</span><div><b>${escapeHtml(title)}</b><small>基于当前模拟遥测、状态与资产关系</small></div></div><p>${escapeHtml(summary)}</p><div class="ai-insights">${causes.map((c,i)=>`<div><em>${i+1}</em><span>${escapeHtml(c)}</span></div>`).join('')}</div><div class="ai-recommend"><b>建议下一步</b><span>打开相关设备数字档案 → 检查网关关系 → 确认最近事件 → 执行重连或维护动作</span></div>`;
+  }
+  window.openDeviceDetail=(id)=>{ const row=document.querySelector(`#device-list tr[data-id="${CSS.escape(id)}"]`); if(row) row.click(); else { const d=getDevices().find(x=>x.id===id); if(d&&typeof window.__openDetail==='function') window.__openDetail(id); } };
+  const originalOpen=window.openDetail; if(originalOpen){ window.__openDetail=originalOpen; window.openDetail=(id)=>{originalOpen(id);}; }
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{const input=$('#ai-input'); if(input){input.value=b.dataset.prompt; runAI(b.dataset.prompt); $('#ai-result')?.scrollIntoView({behavior:'smooth',block:'nearest'});}}));
+    $('#ai-run')?.addEventListener('click',()=>runAI($('#ai-input')?.value||''));
+    $('#ai-input')?.addEventListener('keydown',e=>{if(e.key==='Enter')runAI(e.currentTarget.value||'');});
+    renderRisk(); renderHealthChart(); renderEnergy();
+    setTimeout(enhanceTable,0);
+  });
+  window.addEventListener('iot-model-change',()=>{renderRisk(); enhanceTable();});
+})();
