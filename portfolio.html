@@ -10,9 +10,7 @@
 <body>
   <header class="nav">
     <a class="brand" href="#top"><span class="brand-mark">IO</span><span><b>IoT + AI</b><small>PRODUCT CASE / 2026</small></span></a>
-    <nav>
-      <a href="#overview">概览</a><a href="#modules">核心模块</a><a href="#architecture">架构</a><a href="#story">项目故事</a>
-    </nav>
+    <nav><a href="#overview">概览</a><a href="#modules">模块</a><a href="#workflow">闭环</a><a href="#architecture">架构</a><a href="#story">项目故事</a></nav>
     <div class="nav-actions"><a class="ghost" href="index.html">管理端 Demo</a><a class="primary" href="user.html">用户端 Demo</a></div>
   </header>
 
@@ -21,47 +19,54 @@
       <div class="hero-copy">
         <p class="kicker">IoT / SMART OPERATIONS / PORTFOLIO</p>
         <h1>IoT 智能运维<br><span>与设备管理平台</span></h1>
-        <p class="subtitle">一个面向 IoT 设备监控、告警运维、数据分析与 AI 辅助决策的作品级 Web Demo。</p>
-        <div class="hero-tags"><span>设备监控</span><span>数据分析</span><span>智能告警</span><span>AI 运维助手</span></div>
+        <p class="subtitle">一个面向 IoT 设备监控、告警运维、数据分析、数字拓扑与 AI 辅助决策的作品级 Web Demo。</p>
+        <div class="hero-tags"><span>设备监控</span><span>资产拓扑</span><span>智能告警</span><span>能效分析</span><span>AI 根因诊断</span><span>知识闭环</span></div>
         <div class="hero-actions"><a class="primary big" href="index.html">打开管理端 Demo →</a><a class="ghost big" href="user.html">查看用户端 →</a></div>
-        <p class="note">本作品使用浏览器模拟 IoT 数据流与交互，用于展示产品设计、业务抽象与 AI 协作开发能力；真实版可接入 MQTT / HTTP / WebSocket / 数据库。</p>
+        <p class="note">作品使用浏览器模拟 IoT 数据流与交互，用于展示产品设计、业务抽象与 AI 协作开发能力；真实版可接入 MQTT / HTTP / WebSocket / 数据库。</p>
       </div>
       <div class="hero-screen">
         <div class="screen-head"><span>IoT Control Center</span><span>● LIVE</span></div>
-        <div class="screen-stats"><div><small>设备总数</small><strong>1,000</strong><em>LOGICAL</em></div><div><small>在线设备</small><strong>60.1%</strong><em class="ok">ONLINE</em></div><div><small>异常设备</small><strong>200</strong><em class="warn">WARNING</em></div><div><small>超时告警</small><strong>400</strong><em class="bad">ALERT</em></div></div>
+        <div class="screen-stats"><div><small>设备总数</small><strong>1,000</strong><em>ASSETS</em></div><div><small>在线率</small><strong>60.1%</strong><em class="ok">ONLINE</em></div><div><small>异常设备</small><strong>200</strong><em class="warn">RISK</em></div><div><small>活动告警</small><strong>400</strong><em class="bad">INCIDENT</em></div></div>
         <div class="screen-grid"><div class="mini-map"><span class="zone za">A</span><span class="zone zb">B</span><span class="zone zc">C</span><span class="zone zd">D</span><span class="pin p1"></span><span class="pin p2"></span><span class="pin p3"></span><span class="pin p4"></span><span class="pin p5"></span><span class="pin p6"></span></div><div class="chart"><div class="chart-title">NETWORK / 24H</div><div class="line l1"></div><div class="line l2"></div><div class="line l3"></div><div class="axis"><span>00</span><span>06</span><span>12</span><span>18</span><span>24</span></div></div></div>
-        <div class="screen-row"><div><small>ENERGY</small><strong>2,480 <span>kWh</span></strong></div><div><small>ACTIVE INCIDENTS</small><strong>14</strong></div><div><small>AI INSIGHTS</small><strong>03</strong></div></div>
+        <div class="screen-row"><div><small>ENERGY</small><strong>2,480 <span>kWh</span></strong></div><div><small>AI INSIGHTS</small><strong>03</strong></div><div><small>KNOWLEDGE CASES</small><strong>06</strong></div></div>
       </div>
     </section>
 
     <section class="section" id="modules">
-      <div class="section-title"><p class="kicker">PRODUCT MODULES</p><h2>不是一个“大屏”，而是一套产品逻辑</h2><p>从“看设备”升级到“管设备、管异常、管能耗，再用 AI 辅助判断”。</p></div>
+      <div class="section-title"><p class="kicker">PRODUCT MODULES</p><h2>不是一个“大屏”，而是一套产品逻辑</h2><p>围绕资产、状态、异常、分析、处置、复盘组织产品，让每个页面都能把用户带到下一步动作。</p></div>
       <div class="module-grid">
-        <article><span class="num">01</span><div class="icon">⌁</div><h3>总览驾驶舱</h3><p>设备规模、在线率、实时告警、网络健康与园区拓扑，用一张页面建立全局态势。</p><b>可视化 · 实时状态</b></article>
-        <article><span class="num">02</span><div class="icon">◉</div><h3>设备中心</h3><p>设备、区域、网关、协议、遥测、历史数据统一组织，支持进入单设备详情。</p><b>生命周期 · 数据模型</b></article>
-        <article><span class="num">03</span><div class="icon">!</div><h3>告警中心</h3><p>把异常从“红点提示”变成“发现 → 分级 → 处理 → 恢复”的运维闭环。</p><b>事件管理 · 工单思维</b></article>
-        <article><span class="num">04</span><div class="icon">↗</div><h3>能耗分析</h3><p>围绕电、水、HVAC 等数据设计趋势、对比与异常识别入口，服务节能运营。</p><b>趋势 · 对比 · 优化</b></article>
-        <article class="ai"><span class="num">05</span><div class="icon">AI</div><h3>AI 运维助手</h3><p>从“数据显示”进一步走向“原因解释”：聚合离线、信号、网关、时间窗口等线索并生成处理建议。</p><b>异常诊断 · 建议生成</b></article>
+        <a class="module-card" href="index.html"><span class="num">01</span><div class="icon">⌁</div><h3>总览驾驶舱</h3><p>设备规模、在线率、实时告警、网络健康与运营指标，快速建立全局态势。</p><b>实时态势 · 统一入口</b></a>
+        <a class="module-card" href="topology.html"><span class="num">02</span><div class="icon">◉</div><h3>资产拓扑</h3><p>园区 → 区域 → 网关 → 设备，结合节点状态与影响范围定位故障传播路径。</p><b>资产层级 · Blast Radius</b></a>
+        <a class="module-card" href="alerts.html"><span class="num">03</span><div class="icon">!</div><h3>告警中心</h3><p>把异常从“红点提示”变成发现、分级、确认、诊断、处置与恢复的事件生命周期。</p><b>Incident Lifecycle</b></a>
+        <a class="module-card" href="analytics.html"><span class="num">04</span><div class="icon">↗</div><h3>运营分析</h3><p>围绕 Availability、OEE、MTBF、MTTR 与能耗，提供趋势、对比与运营判断。</p><b>KPI · Trend · Decision</b></a>
+        <a class="module-card ai" href="index.html#ai-section"><span class="num">05</span><div class="icon">AI</div><h3>AI 根因诊断</h3><p>聚合离线时长、RSSI、温度、网关、历史事件等证据，形成假设、置信度与下一步建议。</p><b>Evidence · Hypothesis · Action</b></a>
+        <a class="module-card knowledge" href="maintenance.html"><span class="num">06</span><div class="icon">↻</div><h3>知识闭环</h3><p>工单完成后沉淀根因、处置方案、优先级与 MTTR，让历史案例反过来影响下一次诊断。</p><b>Resolve · Learn · Reuse</b></a>
       </div>
+    </section>
+
+    <section class="section workflow" id="workflow">
+      <div class="section-title"><p class="kicker">OPERATIONS WORKFLOW</p><h2>一条真正可落地的 IoT 运维闭环</h2><p>从 Detect 到 Close，不让告警停留在一个数字；每一步都有对应页面、数据和动作。</p></div>
+      <div class="flow-line"><div class="flow-step active"><span>01</span><b>Detect</b><small>发现异常</small></div><i>→</i><div class="flow-step"><span>02</span><b>Acknowledge</b><small>确认事件</small></div><i>→</i><div class="flow-step"><span>03</span><b>Diagnose</b><small>AI + 证据</small></div><i>→</i><div class="flow-step"><span>04</span><b>Act</b><small>创建工单</small></div><i>→</i><div class="flow-step"><span>05</span><b>Recover</b><small>现场恢复</small></div><i>→</i><div class="flow-step"><span>06</span><b>Learn</b><small>沉淀知识</small></div></div>
+      <div class="loop-grid"><article><span class="micro">EVENT</span><strong>告警触发</strong><p>状态、信号、温度、最后在线时间进入事件上下文。</p></article><article><span class="micro">AI</span><strong>根因假设</strong><p>给出可能原因、证据和建议，而不是只回答“发生了什么”。</p></article><article><span class="micro">WORK ORDER</span><strong>现场处置</strong><p>从事件直接带着设备上下文进入工单和拓扑页面。</p></article><article><span class="micro">KNOWLEDGE LOOP</span><strong>复盘沉淀</strong><p>完成后的根因、方案与 MTTR 进入历史案例库，影响下一次判断。</p></article></div>
     </section>
 
     <section class="split section" id="architecture">
       <div class="section-title"><p class="kicker">SYSTEM ARCHITECTURE</p><h2>数据怎么流，产品怎么落</h2><p>先建立系统地图，再讨论代码；让产品、项目、技术三种语言可以互相翻译。</p></div>
       <div class="architecture">
-        <div class="arch-row"><span class="arch-label">设备层</span><div class="node"><b>传感器</b><small>温湿度 / 电表 / 门磁</small></div><i>→</i><div class="node"><b>控制器</b><small>泵站 / HVAC / 执行器</small></div></div>
-        <div class="arch-row"><span class="arch-label">接入层</span><div class="node wide"><b>网关</b><small>Modbus / RS485 / BACnet / OPC UA</small></div><i>→</i><div class="node wide"><b>消息通道</b><small>MQTT / HTTP / WebSocket</small></div></div>
-        <div class="arch-row"><span class="arch-label">平台层</span><div class="node cloud"><b>IoT 数据平台</b><small>设备状态 · 遥测 · 告警 · 历史数据</small></div><i>→</i><div class="node"><b>业务服务</b><small>规则 · 分析 · 工单</small></div></div>
-        <div class="arch-row"><span class="arch-label">应用层</span><div class="node"><b>管理端</b><small>运维 / 监控 / 统计</small></div><i>↔</i><div class="node"><b>用户端</b><small>查看 / 控制 / 场景</small></div><i>↔</i><div class="node ai-node"><b>AI 助手</b><small>诊断 / 解释 / 建议</small></div></div>
+        <div class="arch-row"><span class="arch-label">资产层</span><div class="node"><b>园区 / 区域</b><small>业务空间与管理边界</small></div><i>→</i><div class="node"><b>网关</b><small>连接边界 / 协议适配</small></div><i>→</i><div class="node"><b>设备</b><small>传感器 / 控制器 / 电表</small></div></div>
+        <div class="arch-row"><span class="arch-label">数据层</span><div class="node wide"><b>Telemetry</b><small>状态 · 温度 · 电量 · RSSI · 最后在线</small></div><i>→</i><div class="node wide"><b>Event / Rule</b><small>阈值 · 超时 · 风险评分 · 告警分级</small></div></div>
+        <div class="arch-row"><span class="arch-label">平台层</span><div class="node cloud"><b>IoT Operations Platform</b><small>资产模型 · 拓扑 · 告警 · 分析 · 工单 · 历史知识</small></div><i>↔</i><div class="node"><b>Knowledge Loop</b><small>历史案例 · 根因 · 处置方案 · MTTR</small></div></div>
+        <div class="arch-row"><span class="arch-label">应用层</span><div class="node"><b>Management</b><small>监控 / 告警 / 分析 / 运维</small></div><i>↔</i><div class="node"><b>User</b><small>查看 / 控制 / 场景</small></div><i>↔</i><div class="node ai-node"><b>AI Copilot</b><small>诊断 / 解释 / 建议 / 知识检索</small></div></div>
       </div>
     </section>
 
     <section class="section story" id="story">
-      <div class="section-title"><p class="kicker">PROJECT STORY</p><h2>这个作品真正想证明的能力</h2><p>不是“我会写多少代码”，而是我能把真实 IoT 场景拆成产品，并借助 AI 快速做出可验证的东西。</p></div>
-      <div class="story-grid"><div class="story-card"><span>01 / 需求</span><strong>把客户语言变成可执行需求</strong><p>从设备、网络、告警、能源等现场问题出发，抽象成页面、流程与数据模型。</p></div><div class="story-card"><span>02 / 方案</span><strong>把系统拆成模块与架构</strong><p>从“设备 → 网关 → 平台 → 应用”建立系统地图，再定义信息结构和交互。</p></div><div class="story-card"><span>03 / AI 协作</span><strong>让 AI 成为第二生产力</strong><p>使用 AI 辅助结构化需求、生成代码、重构页面、快速验证产品想法，再人工判断。</p></div><div class="story-card"><span>04 / 验证</span><strong>用 Demo 快速和技术团队对齐</strong><p>把抽象方案变成可以点击的原型，提前暴露问题，降低沟通成本。</p></div></div>
-      <div class="quote">“真正有价值的不是做一个漂亮页面，而是能把业务问题、产品逻辑和技术实现串起来。”</div>
+      <div class="section-title"><p class="kicker">PROJECT STORY</p><h2>这个作品真正想证明的能力</h2><p>不是“我会写多少代码”，而是能把真实 IoT 场景拆成产品，并借助 AI 快速做出可验证的东西。</p></div>
+      <div class="story-grid"><div class="story-card"><span>01 / 需求</span><strong>把客户语言变成可执行需求</strong><p>从设备、网络、告警、能源等现场问题出发，抽象成页面、流程与数据模型。</p></div><div class="story-card"><span>02 / 方案</span><strong>把系统拆成模块与架构</strong><p>从资产、事件、指标和处置建立系统地图，再定义信息结构与交互。</p></div><div class="story-card"><span>03 / AI 协作</span><strong>让 AI 成为第二生产力</strong><p>用 AI 辅助需求结构化、代码生成、重构、调试和快速验证，人工把关业务逻辑。</p></div><div class="story-card"><span>04 / 验证</span><strong>用 Demo 快速和技术团队对齐</strong><p>把抽象方案变成可以点击的原型，提前暴露问题，降低沟通成本。</p></div></div>
+      <div class="quote">“真正有价值的不是做一个漂亮页面，而是能把业务问题、产品逻辑、数据模型和技术实现串起来。”</div>
     </section>
 
-    <section class="cta"><div><p class="kicker">LIVE PROJECT</p><h2>继续探索这个作品</h2><p>源码、管理端、用户端全部公开在 GitHub。</p></div><div class="cta-actions"><a class="primary big" href="index.html">管理端 Demo</a><a class="ghost big" href="user.html">用户端 Demo</a><a class="ghost big" href="https://github.com/khalilyong221/iot-dashboard-demo" target="_blank" rel="noopener">GitHub ↗</a></div></section>
+    <section class="cta"><div><p class="kicker">LIVE PROJECT</p><h2>现在就点进去看完整闭环</h2><p>总览、告警、拓扑、分析、维护与 AI 都是独立可演示页面。</p></div><div class="cta-actions"><a class="primary big" href="index.html">总览</a><a class="ghost big" href="alerts.html">告警</a><a class="ghost big" href="topology.html">拓扑</a><a class="ghost big" href="analytics.html">分析</a><a class="ghost big" href="maintenance.html">维护</a><a class="ghost big" href="https://github.com/khalilyong221/iot-dashboard-demo" target="_blank" rel="noopener">GitHub ↗</a></div></section>
   </main>
   <footer>IoT + AI · Product Case 2026 · Designed as a portfolio showcase</footer>
   <script src="portfolio.js"></script>
