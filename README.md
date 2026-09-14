@@ -57,7 +57,14 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 <img src="assets/screenshots/dashboard.png" width="850">
 
 </p>
+### Key Features
 
+| Module | Capability |
+|---|---|
+| Device Monitoring | Real-time telemetry |
+| Digital Twin | Asset topology visualization |
+| AI Diagnosis | Root cause analysis |
+| Maintenance | Knowledge loop |
 ### Digital Twin Topology
 
 <p align="center">
