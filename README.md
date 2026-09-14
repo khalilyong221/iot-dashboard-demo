@@ -1,20 +1,95 @@
-# IoT AI Operations Platform
+## IoT AI Operations Platform
 
-> Industrial IoT + AI Intelligent Operations Center  
-> Portfolio Project · 2026
 
 <p align="center">
 
-<img src="./assets/cover.png" width="900">
+AI-powered Industrial IoT Operations Platform  
+Digital Twin · Incident Intelligence · Predictive Maintenance  
 
 </p>
 
 
-## Live Demo
+<p align="center">
 
+🚀 Portfolio Project · 2026
+
+</p>
+
+
+<p align="center">
+
+<img src="assets/banner.png" width="100%">
+
+</p>
+
+
+---
+
+## System Architecture
+
+
+<p align="center">
+
+<img src="assets/architecture.png" width="900">
+
+</p>
+
+
+---
+<p align="center">
+<img src="assets/architecture.png" width="900">
+</p>
+
+---
+
+> Industrial IoT + AI Intelligent Operations Center  
+> Portfolio Project · 2026
+
+## Live Demo
+---
+
+## Demo Screenshots
+
+### IoT Operations Dashboard
+
+<p align="center">
+
+<img src="assets/screenshots/dashboard.png" width="850">
+
+</p>
+
+### Digital Twin Topology
+
+<p align="center">
+
+<img src="assets/screenshots/topology.png" width="850">
+
+</p>
+
+### AI Diagnosis Assistant
+
+<p align="center">
+
+<img src="assets/screenshots/ai-diagnosis.png" width="850">
+
+</p>
 🌐 Online:
 https://khalilyong221.github.io/iot-dashboard-demo/
+---
 
+## Demo Screenshots
+
+### Operations Dashboard
+
+![Dashboard](assets/screenshots/dashboard.png)
+
+### Digital Twin Topology
+
+![Topology](assets/screenshots/topology.png)
+
+### AI Diagnosis Center
+
+![AI Diagnosis](assets/screenshots/ai-diagnosis.png)
 
 ## Project Overview
 
@@ -97,3 +172,101 @@ https://khalilyong221.github.io/iot-dashboard-demo/
 
 Khalil
 IoT Product Manager
+---
+
+## Project Structure
+
+```text
+AIoT-Operations-Platform-V1
+
+├── index.html
+├── iot-monitor-center.html
+├── demo.html
+
+├── portfolio.html
+│
+├── assets/
+│   └── charts
+│
+├── docs/
+│   └── architecture.md
+│
+├── ai-operations/
+│   ├── ai diagnosis
+│   └── knowledge loop
+│
+├── topology/
+│   ├── digital twin
+│   └── device relationship
+│
+├── analytics/
+│   ├── OEE
+│   ├── MTBF
+│   └── MTTR
+│
+├── maintenance/
+│   ├── work order
+│   └── field action
+│
+└── shared/
+    └── common components
+Product Highlights
+1. IoT Monitoring Center
+
+Real-time equipment status visualization.
+
+Capabilities:
+
+Device health monitoring
+Alarm detection
+Network status
+Operational KPI
+2. Digital Twin Topology
+
+Visual representation of:
+
+Factory area
+IoT gateway
+Device relationship
+Data flow
+3. AI Diagnosis Engine
+
+AI assisted fault analysis:
+
+Telemetry
+    ↓
+Pattern Recognition
+    ↓
+Root Cause Analysis
+    ↓
+Recommended Action
+4. Intelligent Maintenance Workflow
+Incident
+   ↓
+Diagnosis
+   ↓
+Work Order
+   ↓
+Field Action
+   ↓
+Verification
+   ↓
+Knowledge Update
+Demo Scenario
+
+A typical industrial IoT operation workflow:
+
+Device abnormality detected
+Alarm generated
+AI analyzes possible causes
+Maintenance task created
+Repair result verified
+Knowledge base updated
+Future Roadmap
+AI Agent for autonomous diagnosis
+Real-time MQTT telemetry
+Digital Twin 3D visualization
+Predictive maintenance model
+Industrial knowledge graph
+
+---  
