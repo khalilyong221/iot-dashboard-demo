@@ -1,6 +1,37 @@
 # IoT AI Operations Platform
 
+> Industrial IoT + AI Intelligent Operations Center  
+> Portfolio Project · 2026
+
+<p align="center">
+
+<img src="./assets/cover.png" width="900">
+
+</p>
+
+
+## Live Demo
+
+🌐 Online:
+https://khalilyong221.github.io/iot-dashboard-demo/
+
+
 ## Project Overview
+
+An enterprise-level IoT intelligent operations platform prototype.
+
+The system integrates:
+
+- Device monitoring
+- Digital Twin visualization
+- Incident management
+- AI-assisted diagnosis
+- Predictive maintenance
+- Operation analytics
+
+
+The goal is to transform traditional equipment monitoring into an AI-driven closed-loop operation system.
+
 
 一个面向工业设备运维场景的 IoT + AI 智能运营平台。
 
