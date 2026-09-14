@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="theme-color" content="#07111f" />
+  <title>3-Minute Demo · IoT + AI</title>
+  <link rel="stylesheet" href="dashboard-v2.css" />
+  <link rel="stylesheet" href="demo.css" />
+</head>
+<body>
+  <div class="demo-shell">
+    <header class="demo-head">
+      <div>
+        <p class="eyebrow">INTERVIEW MODE / 3-MINUTE PRODUCT WALKTHROUGH</p>
+        <h1>从异常到知识：一条完整 IoT 运维闭环</h1>
+        <p class="sub">按照下面 7 步点击，面试官可以在 3 分钟内看懂产品逻辑、AI 能力与跨页面业务闭环。</p>
+      </div>
+      <div class="demo-actions"><a class="action" href="portfolio.html">Portfolio</a><a class="action primary" href="index.html">直接进入总览</a></div>
+    </header>
+
+    <section class="case-bar">
+      <div><span>演示案例</span><strong id="case-device">IOT-0004</strong><small id="case-meta">--</small></div>
+      <div class="case-state"><i></i><span id="case-status">案例已就绪</span></div>
+    </section>
+
+    <section class="steps" id="steps">
+      <article class="step active" data-step="1"><span>01</span><div><b>建立全局态势</b><p>看设备规模、在线率、告警与风险分布。</p></div><a href="index.html">打开总览 →</a></article>
+      <article class="step" data-step="2"><span>02</span><div><b>定位异常资产</b><p>从资产表进入单设备数字档案。</p></div><a href="index.html?device=IOT-0004#devices">查看设备 →</a></article>
+      <article class="step" data-step="3"><span>03</span><div><b>确认事件上下文</b><p>查看告警等级、信号、最后在线与根因信号。</p></div><a href="alerts.html?device=IOT-0004">进入告警 →</a></article>
+      <article class="step" data-step="4"><span>04</span><div><b>让 AI 给出解释</b><p>生成根因假设、证据、置信度与下一步动作。</p></div><a href="index.html?device=IOT-0004#ai-section">AI 诊断 →</a></article>
+      <article class="step" data-step="5"><span>05</span><div><b>查看影响范围</b><p>用数字拓扑理解园区 → 区域 → 网关 → 设备关系。</p></div><a href="topology.html?device=IOT-0004">查看拓扑 →</a></article>
+      <article class="step" data-step="6"><span>06</span><div><b>进入现场处置</b><p>把设备上下文带入工单，形成可执行任务。</p></div><a href="maintenance.html?device=IOT-0004&from=demo">创建工单 →</a></article>
+      <article class="step" data-step="7"><span>07</span><div><b>完成后沉淀知识</b><p>根因、方案、优先级与 MTTR 进入知识闭环。</p></div><a href="maintenance.html?device=IOT-0004">查看维护闭环 →</a></article>
+    </section>
+
+    <section class="talk-track">
+      <div><p class="eyebrow">INTERVIEW TALK TRACK</p><h2>面试时这样讲</h2><p id="talk-text">“我先从总览看系统健康度，再从风险设备进入事件上下文。”</p></div>
+      <button class="action primary" id="next-step">下一步 →</button>
+    </section>
+
+    <section class="proof-grid">
+      <div><span>PRODUCT</span><strong>资产 → 事件 → 分析 → 处置</strong><small>核心业务信息结构</small></div>
+      <div><span>AI</span><strong>Evidence → Hypothesis → Action</strong><small>AI 是决策支持，不是聊天装饰</small></div>
+      <div><span>ENGINEERING</span><strong>Shared Data Model</strong><small>管理端与用户端共用数据模型</small></div>
+      <div><span>LEARNING</span><strong>Resolve → Learn → Reuse</strong><small>工单结果反哺下一次诊断</small></div>
+    </section>
+  </div>
+  <script src="shared-data.js"></script>
+  <script src="knowledge-loop.js"></script>
+  <script src="demo.js"></script>
+</body>
+</html>
