@@ -12,6 +12,14 @@ const IoTShared = (() => {
     { id:'U-008', domain:'home', name:'阳台温湿度计', room:'阳台', type:'sensor', icon:'⌁', desc:'26.4°C · 湿度 61%', online:true, temp:26.4, humidity:61, alert:false }
   ];
 
+  const gatewayByZone = {
+    'A 区温室':'Gateway-A03',
+    'B 区冷库':'Gateway-B02',
+    'C 区仓库':'Gateway-C02',
+    'D 区泵站':'Gateway-D01',
+    'E 区配电房':'Gateway-E04'
+  };
+
   const fieldSeed = Array.from({ length: 1000 }, (_, index) => {
     const number = String(index + 1).padStart(4, '0');
     const type = ['温度传感器', '电表', '门磁', '网关', '泵站控制器'][index % 5];
@@ -37,6 +45,9 @@ const IoTShared = (() => {
       domain:'field',
       type,
       zone,
+      gateway:gatewayByZone[zone],
+      protocol:['LoRaWAN','Modbus TCP','NB-IoT','MQTT'][index % 4],
+      firmware:`v${1 + (index % 3)}.${index % 8}.${index % 10}`,
       status:pattern.status,
       signal:pattern.status === 'offline' ? '--' : pattern.status === 'warning' ? '较弱' : '良好',
       rssi:pattern.status === 'offline' ? null : -48 - (index % 48),
