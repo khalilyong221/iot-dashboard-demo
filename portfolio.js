@@ -1,0 +1,3 @@
+const links=[...document.querySelectorAll('a[href^="#"]')];links.forEach(a=>a.addEventListener('click',()=>{links.forEach(x=>x.classList.remove('active'));a.classList.add('active')}));
+const hero=document.querySelector('.hero-screen');
+if(hero){let t=0;setInterval(()=>{t++;const stat=hero.querySelector('.screen-stats div:nth-child(2) strong');if(stat)stat.textContent=(60.1+Math.sin(t/4)*1.8).toFixed(1)+'%';},3000)}
