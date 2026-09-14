@@ -18,7 +18,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/banner.png" width="100%">
+<img src="./assets/banner.png" width="100%">
 
 </p>
 
@@ -30,14 +30,14 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/architecture.png" width="900">
+<img src="./assets/architecture.png" width="900">
 
 </p>
 
 
 ---
 <p align="center">
-<img src="assets/architecture.png" width="900">
+<img src="./assets/architecture.png" width="900">
 </p>
 
 ---
@@ -54,7 +54,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/screenshots/dashboard.png" width="850">
+<img src="./assets/screenshots/dashboard.png" width="850">
 
 </p>
 ### Key Features
@@ -69,7 +69,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/screenshots/topology.png" width="850">
+<img src="./assets/screenshots/topology.png" width="850">
 
 </p>
 
@@ -77,7 +77,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/screenshots/ai-diagnosis.png" width="850">
+<img src="./assets/screenshots/ai-diagnosis.png" width="850">
 
 </p>
 🌐 Online:
