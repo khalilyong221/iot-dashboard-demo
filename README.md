@@ -36,11 +36,6 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 
 ---
-<p align="center">
-<img src="./assets/architecture.png" width="900">
-</p>
-
----
 
 > Industrial IoT + AI Intelligent Operations Center  
 > Portfolio Project · 2026
@@ -54,7 +49,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="./assets/screenshots/dashboard.png" width="850">
+<img src="./screenshots/dashboard.png" width="850">
 
 </p>
 ### Key Features
@@ -69,7 +64,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="./assets/screenshots/topology.png" width="850">
+<img src="./screenshots/topology.png" width="850">
 
 </p>
 
@@ -77,26 +72,12 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="./assets/screenshots/ai-diagnosis.png" width="850">
+<img src="./screenshots/ai-diagnosis.png" width="850">
 
 </p>
 🌐 Online:
 https://khalilyong221.github.io/iot-dashboard-demo/
 ---
-
-## Demo Screenshots
-
-### Operations Dashboard
-
-![Dashboard](assets/screenshots/dashboard.png)
-
-### Digital Twin Topology
-
-![Topology](assets/screenshots/topology.png)
-
-### AI Diagnosis Center
-
-![AI Diagnosis](assets/screenshots/ai-diagnosis.png)
 
 ## Project Overview
 
