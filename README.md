@@ -15,7 +15,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/img/banner.png" width="100%">
+<img src="assets/img/banner.jpg" width="100%">
 
 </p>
 
@@ -41,7 +41,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="screenshots/dashboard.png" width="850">
+<img src="screenshots/dashboard.jpg" width="850">
 
 </p>
 
@@ -49,7 +49,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="screenshots/topology.png" width="850">
+<img src="screenshots/topology.jpg" width="850">
 
 </p>
 
@@ -57,7 +57,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="screenshots/ai-diagnosis.png" width="850">
+<img src="screenshots/ai-diagnosis.jpg" width="850">
 
 </p>
 
@@ -106,7 +106,7 @@ The goal is to transform traditional equipment monitoring into an AI-driven clos
 
 <p align="center">
 
-<img src="assets/img/architecture.png" width="900">
+<img src="assets/img/architecture.jpg" width="900">
 
 </p>
 
