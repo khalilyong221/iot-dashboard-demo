@@ -12,7 +12,9 @@
   var q = new URLSearchParams(location.search);
   var h = new URLSearchParams((location.hash || '').replace(/^#/, ''));
   function P(k) { return q.get(k) || h.get(k); }
-  var DEV_ID = P('id') || '';
+  /* 页面契约是 ?id=；同时兼容 ?device= —— 告警页 / 拓扑页 / 工单页对外都用 device=，
+     粘过来一个链接不该看到"未指定编号" */
+  var DEV_ID = P('id') || P('device') || '';
   var SCENE = P('scene') || 'field';
   /* 地图端用 | 连接三级；同时兼容 / ，便于外部直接粘贴链接 */
   var LOC = (P('loc') || '').split(/[|/]/).map(function (x) { return x.trim(); }).filter(Boolean);

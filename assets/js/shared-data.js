@@ -1,5 +1,5 @@
 const IoTShared = (() => {
-  const storageKey = 'iot-dashboard-shared-model-v5';
+  const storageKey = 'iot-dashboard-shared-model-v6';
 
   /* 确定性洗牌：用于打散"型号 / 状态"与 index 步长的同频关系。
      背景：原先 type、zone、status 都取 index % 5，三者被完全绑定 —— 同一片区型号单一，
@@ -13,6 +13,21 @@ const IoTShared = (() => {
   };
   const shuffledSlots = (length, period, seed) => {
     const a = Array.from({ length }, (_, i) => i % period), rnd = mulberry32(seed);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1)), t = a[i];
+      a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  };
+
+  /* 按配额生成并洗牌槽位：既保住总体比例（运行指标要像真实车队），
+     又让状态与 index 步长无关（否则同一片区状态会扎堆） */
+  const slotPool = (length, counts, seed) => {
+    const a = [];
+    counts.forEach((c, i) => { for (let k = 0; k < c; k++) a.push(i); });
+    while (a.length < length) a.push(0);
+    a.length = length;
+    const rnd = mulberry32(seed);
     for (let i = a.length - 1; i > 0; i--) {
       const j = Math.floor(rnd() * (i + 1)), t = a[i];
       a[i] = a[j]; a[j] = t;
@@ -159,7 +174,9 @@ const IoTShared = (() => {
   };
 
   const BUILDING_TYPES = ['空调机组 AHU','新风机组','冷冻水泵','冷却塔','电梯','照明回路','智能电表','风机盘管','温湿度传感器','变频器'];
-  const buildingPatternSlots = shuffledSlots(180, 5, 0x51c8f2a);
+  /* 楼宇机电可用率高于工业现场：在线 95% / 异常 3.3% / 离线 1.7%
+     （ladder 槽位 0、1、3 为在线，2 为异常，4 为离线） */
+  const buildingPatternSlots = slotPool(180, [57, 57, 6, 57, 3], 0x51c8f2a);
 
   const buildingSeed = Array.from({ length: 180 }, (_, index) => {
     const number = String(index + 1).padStart(4, '0');
@@ -263,7 +280,9 @@ const IoTShared = (() => {
 
   const FIELD_TYPES = ['温度传感器', '电表', '门磁', '网关', '泵站控制器'];
   const fieldTypeSlots = shuffledSlots(1000, FIELD_TYPES.length, 0x2b7d19e);
-  const fieldPatternSlots = shuffledSlots(1000, 5, 0x1f3a5c7);
+  /* 工业现场车队状态配额：在线 93% / 异常 4.5% / 离线 2.5%（槽位 0、1 为在线，2 为异常，3、4 为离线）
+     —— 对齐真实工业物联车队的用量水平；仍留 70 台需要处置，足够撑起告警与诊断链路 */
+  const fieldPatternSlots = slotPool(1000, [465, 465, 45, 12, 13], 0x1f3a5c7);
 
   const fieldSeed = Array.from({ length: 1000 }, (_, index) => {
     const number = String(index + 1).padStart(4, '0');
@@ -310,7 +329,7 @@ const IoTShared = (() => {
   });
 
   const clone = value => structuredClone(value);
-  const defaults = () => ({ version:5, devices:[...clone(fieldSeed), ...clone(buildingSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
+  const defaults = () => ({ version:6, devices:[...clone(fieldSeed), ...clone(buildingSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
 
   function read(){
     try {
@@ -422,6 +441,19 @@ const IoTShared = (() => {
     return getAll('field');
   }
 
+  /* ── 演示案例设备 ──
+     面试动线（demo.html 的 8 步）需要一台"当前确实离线、且有完整遥测上下文"的设备。
+     这里刻意不写死 id：按 离线 > 异常 > 在线，再按离线时长降序取第一台。这样数据重新
+     生成（洗牌种子一变、比例一调）时案例设备会自动跟着换，动线永远不会指向一台
+     现在其实在线的设备。 */
+  function getDemoCase(domain){
+    const rank = d => d.status === 'offline' ? 0 : d.status === 'warning' ? 1 : 2;
+    return getAll(domain || 'field')
+      .sort((a, b) => rank(a) - rank(b)
+        || (b.minutesSinceSeen || 0) - (a.minutesSinceSeen || 0)
+        || (a.id < b.id ? -1 : 1))[0] || null;
+  }
+
   function reset(){
     const model = defaults();
     localStorage.setItem(storageKey, JSON.stringify(model));
@@ -434,5 +466,10 @@ const IoTShared = (() => {
     try { window.dispatchEvent(new CustomEvent('iot-model-change', {detail:JSON.parse(event.newValue)})); } catch(error) {}
   });
 
-  return {storageKey, HOME_ROOMS, BUILDING_ZONES, BUILDING_TYPES, SCENES, ensure, read, write, getAll, getDevice, getFieldDevices, getBuildingDevices, getHomeDevices, getScene, getSceneMeta, setScene, getSceneDevices, toOpsShape, updateDevice, updateFieldDevice, executeCommand, reset};
+  return {storageKey, HOME_ROOMS, BUILDING_ZONES, BUILDING_TYPES, SCENES, ensure, read, write, getAll, getDevice, getFieldDevices, getBuildingDevices, getHomeDevices, getScene, getSceneMeta, setScene, getSceneDevices, getDemoCase, toOpsShape, updateDevice, updateFieldDevice, executeCommand, reset};
 })();
+
+/* 顶层 const 不会挂到 window 上，但 demo.js / ai-operations.js / analytics.js /
+   maintenance.js / topology.js 都是用 window.IoTShared 取数的 —— 不补这个别名，
+   它们拿到的恒为 undefined（表现为 analytics 可用率停在 0.0%、驾驶舱 AI 面板空白） */
+window.IoTShared = IoTShared;

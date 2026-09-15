@@ -12,14 +12,32 @@
   let current=0;
   const $=s=>document.querySelector(s);
   const all=()=>document.querySelectorAll('.step');
-  function device(){return window.IoTShared?.getFieldDevices?.().find(d=>d.id==='IOT-0004')||{id:'IOT-0004',name:'温度传感器 0004',zone:'A 区温室',gateway:'Gateway-A03',status:'offline'};}
+
+  /* 案例设备不写死 id：从共享资产模型取当前真正离线、且离线最久的那台。
+     否则一旦数据重新生成（比例调整、洗牌种子变化），动线就会指向一台其实在线的设备，
+     第 3 步"定位异常资产"打开的是一台健康设备，整个叙事直接断掉。 */
+  function device(){
+    return window.IoTShared?.getDemoCase?.('field')
+      || {id:'IOT-0001',name:'温度传感器 0001',zone:'A 区温室',gateway:'Gateway-A03',status:'offline'};
+  }
+  /* 页面里 6 处链接写成 device=__CASE__，加载后用真实案例设备编号替换 */
+  function applyLinks(id){
+    const token='__CASE__', enc=encodeURIComponent(id);
+    document.querySelectorAll('a[href*="'+token+'"]').forEach(a=>{
+      a.setAttribute('href', a.getAttribute('href').split(token).join(enc));
+    });
+  }
   function render(){
+    const d=device();
     all().forEach((el,i)=>el.classList.toggle('active',i===current));
     $('#talk-text').textContent=steps[current];
     $('#next-step').textContent=current===steps.length-1?'重新开始 ↺':'下一步 →';
-    const d=device();$('#case-device').textContent=d.id;$('#case-meta').textContent=`${d.name} · ${d.zone} · ${d.gateway||'Gateway'} · ${d.status==='offline'?'离线异常':'状态异常'}`;
+    $('#case-device').textContent=d.id;
+    $('#case-meta').textContent=`${d.name} · ${d.zone} · ${d.gateway||'Gateway'} · ${d.status==='offline'?`离线 ${d.minutesSinceSeen||0} 分钟`:'状态异常'}`;
     $('#case-status').textContent=`当前步骤 ${current+1}/8 · ${['态势','分布','资产','事件','AI','拓扑','处置','知识'][current]}`;
   }
+  applyLinks(device().id);
+  render();
   $('#next-step').addEventListener('click',()=>{current=(current+1)%steps.length;render();window.scrollTo({top:document.querySelector('.steps').offsetTop-24,behavior:'smooth'});});
   all().forEach((el,i)=>el.addEventListener('click',e=>{if(e.target.closest('a'))return;current=i;render();}));
   render();
