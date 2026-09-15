@@ -86,7 +86,12 @@ a { color: inherit; text-decoration: none; }
 .dd-kpi-cell strong { display: block; margin: 6px 0 4px; font-size: 17px; line-height: 1; font-variant-numeric: tabular-nums; }
 .dd-kpi-cell small { display: block; color: #4e6479; font-size: 8.5px; }
 
-#dd-chart { height: 186px; margin-top: 4px; }
+/* 网格子项默认 min-width:auto，ECharts 画布（固定像素宽度）会顶住网格轨道，
+   形成「画布撑住容器 → 缩窗口时 resize 读到的仍是旧宽度」的自锁，这里统一放开下限 */
+.dd-grid > *, .dd-col > * { min-width: 0; }
+.dd-panel { overflow: hidden; }
+
+#dd-chart { width: 100%; min-width: 0; height: 186px; margin-top: 4px; }
 
 /* 站点 */
 .dd-site-head {
@@ -96,7 +101,12 @@ a { color: inherit; text-decoration: none; }
 .dd-site-head span { display: block; color: #5d7a92; font-size: 9px; }
 .dd-site-head strong { display: block; margin-top: 5px; font-size: 14px; color: #c3d9ec; }
 .dd-site-head em { display: block; margin-top: 6px; font-style: normal; color: #5d7a92; font-size: 9.5px; }
-.dd-dev-list { display: grid; gap: 1px; }
+/* 站点设备群：固定高度的内部滚动区。40 行全部铺开会把左栏撑到 1470px 以上，
+   把工单区块顶到首屏之外，同时让右栏底部留下一大片空白 */
+.dd-dev-list { display: grid; gap: 1px; max-height: 424px; overflow-y: auto; padding-right: 3px; }
+.dd-dev-list::-webkit-scrollbar { width: 7px; }
+.dd-dev-list::-webkit-scrollbar-thumb { background: #1d3247; border-radius: 4px; }
+.dd-dev-list::-webkit-scrollbar-track { background: transparent; }
 .dd-dev-row {
   display: flex; align-items: center; gap: 9px; padding: 8px 7px; border-radius: 6px;
   transition: background .15s; cursor: pointer;
@@ -137,6 +147,10 @@ a { color: inherit; text-decoration: none; }
 }
 .dd-reason strong { display: block; color: #e0858d; font-size: 11px; }
 .dd-reason p { margin: 6px 0 0; color: #a8909a; font-size: 10px; line-height: 1.65; }
+/* 状态异常（仍在上报数据）用琥珀色，与离线原因的红色区分开 */
+.dd-reason.warn { border-color: #4a3c1e; background: #1a1608; }
+.dd-reason.warn strong { color: #e5b444; }
+.dd-reason.warn p { color: #a89a80; }
 .dd-advice { display: grid; gap: 8px; }
 .dd-advice-item {
   display: flex; gap: 9px; padding: 10px 11px; border: 1px solid var(--line);
@@ -162,4 +176,66 @@ a { color: inherit; text-decoration: none; }
 .dd-missing h1 { margin: 0 0 10px; font-size: 20px; }
 .dd-missing p { margin: 0 0 18px; color: #64798f; font-size: 11.5px; }
 
+/* 设备群视角切换：同站点 / 同网关 */
+.dd-scope { display: flex; gap: 6px; margin-bottom: 10px; }
+.dd-scope button {
+  flex: 1 1 0; min-width: 0; height: 28px; padding: 0 10px; cursor: pointer;
+  border: 1px solid var(--line2); border-radius: 7px; background: #0a1521;
+  color: #6f849a; font-size: 10px; font-weight: 700; font-family: inherit;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  transition: color .16s, border-color .16s, background .16s;
+}
+.dd-scope button:hover { color: var(--blue-l); border-color: #2c5a83; }
+.dd-scope button.on {
+  background: linear-gradient(135deg, #14395a, #0e2640);
+  border-color: #2c5a83; color: #dbeefd;
+}
+
+/* 工单记录 */
+.dd-wo-stats {
+  display: flex; gap: 15px; flex-wrap: wrap; padding: 9px 11px; margin-bottom: 9px;
+  border: 1px solid var(--line); border-radius: 8px; background: #09131f;
+  color: #64798f; font-size: 9.5px;
+}
+.dd-wo-stats b { color: #c3d9ec; font-size: 11px; font-variant-numeric: tabular-nums; }
+.dd-wo-list { display: grid; gap: 7px; }
+.dd-wo-row {
+  padding: 9px 11px; border: 1px solid var(--line); border-left: 2px solid #1d3247;
+  border-radius: 8px; background: #09131f;
+}
+.dd-wo-row.mine { border-left-color: var(--blue); background: #0b1a2a; }
+.dd-wo-top { display: flex; align-items: center; gap: 8px; }
+.dd-wo-no {
+  color: #7fa8ca; font-size: 9.5px; font-weight: 800; letter-spacing: .3px;
+  font-variant-numeric: tabular-nums;
+}
+.dd-wo-state {
+  margin-left: auto; flex: none; font-style: normal; padding: 2px 7px; border-radius: 4px;
+  background: rgba(52,211,153,.12); color: #4fd6a6; font-size: 8.5px; font-weight: 800;
+}
+.dd-wo-state.open { background: rgba(251,191,36,.13); color: #e5b444; }
+.dd-wo-meta { display: flex; gap: 13px; flex-wrap: wrap; margin-top: 6px; color: #4e6479; font-size: 8.5px; }
+.dd-wo-cause { margin: 6px 0 0; color: #7d93a8; font-size: 9.5px; line-height: 1.6; }
+.dd-empty, .dd-more { padding: 12px 4px; color: #4e6479; font-size: 9px; text-align: center; }
+
+/* 一键生成工单的轻提示 */
+.dd-toast {
+  position: fixed; left: 50%; bottom: 26px; z-index: 90;
+  transform: translate(-50%, 14px); opacity: 0; pointer-events: none;
+  padding: 10px 16px; border: 1px solid #2c5a83; border-radius: 9px;
+  background: rgba(10,22,36,.97); color: #dbeefd; font-size: 11px; font-weight: 700;
+  box-shadow: 0 10px 28px rgba(0,0,0,.5);
+  transition: opacity .22s, transform .22s;
+}
+.dd-toast.on { opacity: 1; transform: translate(-50%, 0); }
+
 @media (max-width: 1080px) { .dd-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) {
+  .dd-body { padding: 14px 12px 32px; }
+  .dd-top { padding: 10px 12px; gap: 10px; }
+  .dd-tools { margin-left: 0; width: 100%; }
+  .dd-scope { flex-direction: column; }
+  .dd-wo-stats { gap: 11px; }
+  .dd-hero-main h1 { font-size: 19px; }
+}
+

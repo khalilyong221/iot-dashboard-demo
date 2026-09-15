@@ -21,6 +21,13 @@
   var DOMAIN_ICON = { field: '⌬', building: '⌂', home: '◈' };
   var SCENE_TEXT = { field: '工业互联网', building: '楼宇自控', home: '智慧家居', all: '全域设备' };
 
+  /* 设备群视角：按片区（同站点）或按网关（跨片区同一汇聚点） */
+  var PEER_SCOPE = 'zone';
+  /* 用户在本页新建的工单存本地，与确定性生成的履历合并展示 */
+  var WO_KEY = 'iot-workorders-v1';
+  var WO_TYPES = ['计划巡检', '故障处置', '传感器校准', '固件升级', '部件更换'];
+  var WO_OWNERS = ['李工', '陈工', '王工', '赵工', '刘工'];
+
   function esc(s) {
     return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
@@ -49,14 +56,86 @@
     return null;
   }
 
-  function peersOf(d) {
+  function peersOf(d, scope) {
     var S = SHARED();
     var all = (S && S.getSceneDevices && S.getSceneDevices('all')) || [];
-    /* 同一业务线 + 同一站点分区 = 该站点（一个家庭 / 一栋楼宇 / 一座园区）的设备群 */
+    /* 同一业务线内的设备群：按片区＝同站点，按网关＝同一汇聚点下的全部设备 */
     var sameDomain = all.filter(function (x) { return x.domain === d.domain; });
+    if (scope === 'gateway' && d.gateway) {
+      var byGw = sameDomain.filter(function (x) { return x.gateway === d.gateway; });
+      if (byGw.length) return byGw;
+    }
     var pool = sameDomain.filter(function (x) { return x.zone === d.zone; });
-    if (!pool.length) pool = sameDomain;
-    return pool;
+    return pool.length ? pool : sameDomain;
+  }
+
+  /* ────────────────────────────── 工单履历 ────────────────────────────── */
+  function woSeedOf(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+    return function () {
+      h += 0x6D2B79F5;
+      var t = Math.imul(h ^ h >>> 15, 1 | h);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+  function p2(n) { return String(n).padStart(2, '0'); }
+  function localWOs() {
+    try { return JSON.parse(localStorage.getItem(WO_KEY) || '{}') || {}; } catch (e) { return {}; }
+  }
+  function saveLocalWOs(m) {
+    try { localStorage.setItem(WO_KEY, JSON.stringify(m)); } catch (e) { /* 忽略 */ }
+  }
+  /* 按设备编号确定性生成历史工单，保证刷新后履历一致 */
+  function historyWOs(d) {
+    var rnd = woSeedOf(d.id), n = 2 + Math.floor(rnd() * 3), out = [];
+    for (var i = 0; i < n; i++) {
+      var dt = new Date(Date.now() - Math.floor(4 + rnd() * 76) * 86400000);
+      out.push({
+        no: 'WO-' + String(dt.getFullYear()).slice(2) + p2(dt.getMonth() + 1) + p2(dt.getDate()) +
+          '-' + String(1000 + Math.floor(rnd() * 9000)),
+        date: dt.getFullYear() + '-' + p2(dt.getMonth() + 1) + '-' + p2(dt.getDate()),
+        type: WO_TYPES[Math.floor(rnd() * WO_TYPES.length)],
+        owner: WO_OWNERS[Math.floor(rnd() * WO_OWNERS.length)],
+        hours: +(1 + rnd() * 6).toFixed(1),
+        state: '已关闭',
+        cause: d.offlineReason || (d.status === 'warning' ? '读数越限，现场复核后恢复正常' : '例行巡检，参数正常')
+      });
+    }
+    return out;
+  }
+  function allWOs(d) {
+    var mine = (localWOs()[d.id] || []).slice();
+    var all = mine.concat(historyWOs(d));
+    all.sort(function (a, b) { return a.date < b.date ? 1 : a.date > b.date ? -1 : 0; });
+    return all;
+  }
+  /* 一键生成工单：写入本地记录并立刻出现在履历顶部 */
+  function createWO(d) {
+    var dt = new Date();
+    var no = 'WO-' + String(dt.getFullYear()).slice(2) + p2(dt.getMonth() + 1) + p2(dt.getDate()) +
+      '-' + String(1000 + Math.floor(Math.random() * 9000));
+    var m = localWOs(), arr = m[d.id] || [];
+    arr.unshift({
+      no: no, date: dt.getFullYear() + '-' + p2(dt.getMonth() + 1) + '-' + p2(dt.getDate()),
+      type: d.status === 'online' ? '计划巡检' : '故障处置',
+      owner: '待派单', hours: 0, state: '待派单', mine: true,
+      cause: d.offlineReason || (d.status === 'warning' ? '读数越限，待现场确认' : '例行巡检，参数正常')
+    });
+    m[d.id] = arr; saveLocalWOs(m);
+    return no;
+  }
+  function toast(msg) {
+    var el = document.createElement('div');
+    el.className = 'dd-toast';
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function () { el.classList.add('on'); }, 10);
+    setTimeout(function () {
+      el.classList.remove('on');
+      setTimeout(function () { el.remove(); }, 280);
+    }, 2300);
   }
 
   function renderMissing() {
@@ -72,7 +151,7 @@
 
   function render(d) {
     var st = d.status || 'online';
-    var peers = peersOf(d);
+    var peers = peersOf(d, PEER_SCOPE);
     var onPeers = peers.filter(function (x) { return x.status === 'online'; }).length;
     var warnPeers = peers.filter(function (x) { return x.status === 'warning'; }).length;
     var offPeers = peers.filter(function (x) { return x.status === 'offline'; }).length;
@@ -170,11 +249,24 @@
 
       /* 站点 */
       '<section class="dd-panel">' +
-      '<div class="dd-head-row"><p class="eyebrow">SITE DEVICES</p><h3>同站点设备 <b style="color:#74bdff">' + peers.length + '</b></h3></div>' +
-      '<div class="dd-site-head"><span>所属站点</span><strong>' + esc(siteName(d)) + '</strong>' +
+      '<div class="dd-head-row"><p class="eyebrow">PEER DEVICES</p><h3>' +
+      (PEER_SCOPE === 'gateway' ? '同网关设备' : '同站点设备') +
+      ' <b style="color:#74bdff">' + peers.length + '</b></h3></div>' +
+      '<div class="dd-scope" id="dd-scope">' +
+      '<button data-scope="zone"' + (PEER_SCOPE === 'zone' ? ' class="on"' : '') + '>同站点（' + esc(nz(d.zone, '本站点')) + '）</button>' +
+      '<button data-scope="gateway"' + (PEER_SCOPE === 'gateway' ? ' class="on"' : '') + '>同网关（' + esc(nz(d.gateway)) + '）</button>' +
+      '</div>' +
+      '<div class="dd-site-head"><span>' + (PEER_SCOPE === 'gateway' ? '接入网关' : '所属站点') + '</span><strong>' +
+      esc(PEER_SCOPE === 'gateway' ? nz(d.gateway) : siteName(d)) + '</strong>' +
       '<em>在线 ' + onPeers + ' · 异常 ' + warnPeers + ' · 离线 ' + offPeers + '</em></div>' +
       '<div class="dd-dev-list">' + peerRows + '</div>' +
-      (peers.length > 40 ? '<div class="cn-more" style="padding:10px 4px 2px;color:#4e6479;font-size:9px">仅列出前 40 台，完整清单见分布地图</div>' : '') +
+      (peers.length > 40 ? '<div class="dd-more">仅列出前 40 台，完整清单见分布地图</div>' : '') +
+      '</section>' +
+
+      /* 工单履历 */
+      '<section class="dd-panel">' +
+      '<div class="dd-head-row"><p class="eyebrow">WORK ORDERS</p><h3>工单记录</h3></div>' +
+      '<div id="dd-wo">' + woHtml(d) + '</div>' +
       '</section>' +
 
       '</div>' +
@@ -204,17 +296,18 @@
 
       '<section class="dd-panel">' +
       '<div class="dd-head-row"><p class="eyebrow">AI DIAGNOSIS</p><h3>诊断与处理建议</h3></div>' +
-      (d.offlineReason ? '<div class="dd-reason"><strong>' + esc(d.offlineReason) + '</strong><p>' +
-        esc(d.offlineReasonDetail || '') + '</p></div>' : '') +
+      reasonHtml(d) +
       '<div class="dd-advice">' + adviceHtml + '</div>' +
       '</section>' +
 
       '<section class="dd-panel">' +
+      '<div class="dd-head-row"><p class="eyebrow">NEXT ACTIONS</p><h3>下一步动作</h3></div>' +
       '<div class="dd-actions">' +
-      '<a class="dd-act primary" href="china-map.html?scene=' + encodeURIComponent(SCENE) + '">在分布地图中定位</a>' +
-      '<a class="dd-act" href="alerts.html">查看关联告警</a>' +
-      '<a class="dd-act" href="topology.html">设备拓扑</a>' +
-      '<a class="dd-act" href="maintenance.html">转维修工单</a>' +
+      '<button class="dd-act primary" id="dd-wo-create">＋ 一键生成工单</button>' +
+      '<a class="dd-act" href="' + mapHref + '">在分布地图中定位</a>' +
+      '<a class="dd-act" href="alerts.html?device=' + encodeURIComponent(d.id) + '">查看关联告警</a>' +
+      '<a class="dd-act" href="topology.html?device=' + encodeURIComponent(d.id) + '">设备拓扑</a>' +
+      '<a class="dd-act" href="maintenance.html?device=' + encodeURIComponent(d.id) + '&from=device-detail">进入维修工单页</a>' +
       '</div></section>' +
 
       '</aside></div>';
@@ -223,7 +316,62 @@
       el.addEventListener('click', function () { location.href = 'device-detail.html?id=' + encodeURIComponent(el.getAttribute('data-id')) + '&scene=' + encodeURIComponent(SCENE) + '&loc=' + encodeURIComponent(LOC.join('|')); });
     });
 
+    var scopeBox = document.getElementById('dd-scope');
+    if (scopeBox) {
+      scopeBox.querySelectorAll('button[data-scope]').forEach(function (b) {
+        b.addEventListener('click', function () { PEER_SCOPE = b.getAttribute('data-scope'); render(d); });
+      });
+    }
+    var woBtn = document.getElementById('dd-wo-create');
+    if (woBtn) {
+      woBtn.addEventListener('click', function () {
+        var no = createWO(d);
+        var box = document.getElementById('dd-wo');
+        if (box) box.innerHTML = woHtml(d);
+        toast('已生成工单 ' + no + ' · 状态：待派单');
+      });
+    }
+
     drawChart(d);
+  }
+
+  function woHtml(d) {
+    var list = allWOs(d);
+    var closed = list.filter(function (w) { return w.state === '已关闭'; });
+    var open = list.length - closed.length;
+    var mttr = closed.length
+      ? (closed.reduce(function (a, w) { return a + w.hours; }, 0) / closed.length).toFixed(1) : '--';
+    var rows = list.slice(0, 8).map(function (w) {
+      return '<div class="dd-wo-row' + (w.mine ? ' mine' : '') + '">' +
+        '<div class="dd-wo-top"><span class="dd-wo-no">' + esc(w.no) + '</span>' +
+        '<em class="dd-wo-state' + (w.state === '已关闭' ? '' : ' open') + '">' + esc(w.state) + '</em></div>' +
+        '<div class="dd-wo-meta"><span>' + esc(w.date) + '</span><span>' + esc(w.type) + '</span>' +
+        '<span>' + esc(w.owner) + '</span><span>' + (w.hours ? w.hours + ' h' : '—') + '</span></div>' +
+        '<p class="dd-wo-cause">' + esc(w.cause) + '</p></div>';
+    }).join('');
+    if (!list.length) return '<div class="dd-empty">暂无工单记录，可点击下方「一键生成工单」创建。</div>';
+    return '<div class="dd-wo-stats">' +
+      '<span>累计 <b>' + list.length + '</b> 单</span>' +
+      '<span>未关闭 <b' + (open ? ' style="color:#e5b444"' : '') + '>' + open + '</b></span>' +
+      '<span>平均 MTTR <b style="color:#74bdff">' + mttr + ' h</b></span>' +
+      '</div><div class="dd-wo-list">' + rows + '</div>' +
+      (list.length > 8 ? '<div class="dd-more">仅显示最近 8 条</div>' : '');
+  }
+
+  /* 原因块只在真的出问题时出现：offlineReason 字段对所有设备都有值，不加状态判断的话
+     "运行正常"的设备也会挂一段"网络连接中断"，与徽章自相矛盾 */
+  function reasonHtml(d) {
+    if (d.status === 'offline') {
+      if (!d.offlineReason) return '';
+      return '<div class="dd-reason"><strong>' + esc(d.offlineReason) + '</strong><p>' +
+        esc(d.offlineReasonDetail || '') + '</p></div>';
+    }
+    if (d.status === 'warning') {
+      var head = d.rssi != null ? '通信质量下降（' + d.rssi + ' dBm）' : '上报读数越限';
+      return '<div class="dd-reason warn"><strong>' + esc(head) + '</strong><p>' +
+        '设备仍在上报数据，但连续多个周期处于告警区间。建议对照相邻点位数据，判断是真实工况变化还是传感器漂移。</p></div>';
+    }
+    return '';
   }
 
   function kpi(label, value, color) {
@@ -247,7 +395,10 @@
       ? hist.map(function (h) { return h.temperature; })
       : hist.map(function (h, i) { return Math.max(-72, Math.min(-42, (d.rssi || -60) + Math.sin(i * 1.1) * 3)); });
 
+    if (window.__DD_CHART__) { try { window.__DD_CHART__.dispose(); } catch (e) { /* 忽略 */ } window.__DD_CHART__ = null; }
+    if (window.__DD_RESIZE__) { window.removeEventListener('resize', window.__DD_RESIZE__); window.__DD_RESIZE__ = null; }
     var chart = echarts.init(el, null, { renderer: 'canvas' });
+    window.__DD_CHART__ = chart;
     chart.setOption({
       backgroundColor: 'transparent',
       grid: { left: 42, right: 18, top: 22, bottom: 26 },
@@ -289,7 +440,8 @@
         } : undefined
       }]
     });
-    window.addEventListener('resize', function () { chart.resize(); });
+    window.__DD_RESIZE__ = function () { if (!chart.isDisposed()) chart.resize(); };
+    window.addEventListener('resize', window.__DD_RESIZE__);
   }
 
   function boot() {

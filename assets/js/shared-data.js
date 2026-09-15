@@ -1,5 +1,34 @@
 const IoTShared = (() => {
-  const storageKey = 'iot-dashboard-shared-model-v4';
+  const storageKey = 'iot-dashboard-shared-model-v5';
+
+  /* 确定性洗牌：用于打散"型号 / 状态"与 index 步长的同频关系。
+     背景：原先 type、zone、status 都取 index % 5，三者被完全绑定 —— 同一片区型号单一，
+     且该片区状态完全一致（例如 D 区泵站 200 台全是网关、且全部离线）；楼宇域则是
+     同一协议的设备状态全同。用固定种子的洗牌可以既保持总体比例不变，又让三者相互独立。 */
+  const mulberry32 = seed => () => {
+    seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+  const shuffledSlots = (length, period, seed) => {
+    const a = Array.from({ length }, (_, i) => i % period), rnd = mulberry32(seed);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1)), t = a[i];
+      a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  };
+
+  /* 8 小时趋势：原先按固定步长线性递增，折线画出来是一条笔直的对角线（一眼就是假数据）。
+     这里换成"每个点位不同相位的连续波形 + 少量确定性抖动"：既不是直线，也不会像取模那样
+     在中途出现断崖式跳变。时间点仍是 8:00–15:00 */
+  const trendOf = (base, span, index, step) => Array.from({ length: 8 }, (_, i) => {
+    const phase = (index * 0.37) % (2 * Math.PI) + i * step * 0.09;
+    const level = (span / 10) * (0.35 + 0.3 * Math.sin(phase));
+    const jitter = ((((index * 7) + (i * 13)) % 7) - 3) * 0.09;
+    return +(base + level + jitter).toFixed(1);
+  });
 
   const HOME_ROOMS = ['客厅','餐厅','主卧','次卧','书房','厨房','卫生间','阳台','玄关','全屋'];
 
@@ -130,6 +159,7 @@ const IoTShared = (() => {
   };
 
   const BUILDING_TYPES = ['空调机组 AHU','新风机组','冷冻水泵','冷却塔','电梯','照明回路','智能电表','风机盘管','温湿度传感器','变频器'];
+  const buildingPatternSlots = shuffledSlots(180, 5, 0x51c8f2a);
 
   const buildingSeed = Array.from({ length: 180 }, (_, index) => {
     const number = String(index + 1).padStart(4, '0');
@@ -143,7 +173,8 @@ const IoTShared = (() => {
       { status:'online',  minutes:index % 4 },
       { status:'offline', minutes:14 + (index % 40) }
     ];
-    const pattern = ladder[index % ladder.length];
+    /* 洗牌避免与 protocol 的 index % 5 同频（否则同一协议状态全同） */
+    const pattern = ladder[buildingPatternSlots[index]];
     const reasons = [
       ['DDC 控制器失联','现场 DDC 未按时返回心跳，可能是控制器断电或总线短路。'],
       ['通信总线抖动','BACnet 总线误码率升高，建议检查终端电阻与线缆屏蔽层接地。'],
@@ -173,7 +204,7 @@ const IoTShared = (() => {
       offlineReasonDetail:reason[1],
       battery:mains ? 100 : 46 + ((index * 11) % 54),
       restartCount:index % 4,
-      history:Array.from({length:8}, (_, i) => ({ time:`${8 + i}:00`, temperature:hasTemp ? +(18 + ((index + i * 4) % 110) / 10).toFixed(1) : null }))
+      history:trendOf(18, 110, index, 4).map((t, i) => ({ time:`${8 + i}:00`, temperature:hasTemp ? t : null }))
     };
   });
 
@@ -230,9 +261,13 @@ const IoTShared = (() => {
     'E 区配电房':'Gateway-E04'
   };
 
+  const FIELD_TYPES = ['温度传感器', '电表', '门磁', '网关', '泵站控制器'];
+  const fieldTypeSlots = shuffledSlots(1000, FIELD_TYPES.length, 0x2b7d19e);
+  const fieldPatternSlots = shuffledSlots(1000, 5, 0x1f3a5c7);
+
   const fieldSeed = Array.from({ length: 1000 }, (_, index) => {
     const number = String(index + 1).padStart(4, '0');
-    const type = ['温度传感器', '电表', '门磁', '网关', '泵站控制器'][index % 5];
+    const type = FIELD_TYPES[fieldTypeSlots[index]];
     const patterns = [
       { status:'online', minutes:index % 4 },
       { status:'online', minutes:5 + (index % 5) },
@@ -240,7 +275,8 @@ const IoTShared = (() => {
       { status:'offline', minutes:11 + (index % 30) },
       { status:'offline', minutes:25 + (index % 90) }
     ];
-    const pattern = patterns[index % patterns.length];
+    const pattern = patterns[fieldPatternSlots[index]];
+    /* 片区保持 index % 5：详情页/地图页的"片区 → 站点"命名依赖它，不要改 */
     const zone = ['A 区温室', 'B 区冷库', 'C 区仓库', 'D 区泵站', 'E 区配电房'][index % 5];
     const reasons = [
       ['网络连接中断', '最近一次心跳后没有收到设备响应，可能是现场网络或网关连接异常。'],
@@ -269,12 +305,12 @@ const IoTShared = (() => {
       offlineReasonDetail:reason[1],
       battery:35 + ((index * 13) % 66),
       restartCount:index % 3,
-      history:Array.from({length:8}, (_, i) => ({ time:`${8 + i}:00`, temperature:type === '电表' || type === '门磁' ? null : +(22 + ((index + i * 3) % 80) / 10).toFixed(1) }))
+      history:trendOf(22, 80, index, 3).map((t, i) => ({ time:`${8 + i}:00`, temperature:type === '电表' || type === '门磁' ? null : t }))
     };
   });
 
   const clone = value => structuredClone(value);
-  const defaults = () => ({ version:4, devices:[...clone(fieldSeed), ...clone(buildingSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
+  const defaults = () => ({ version:5, devices:[...clone(fieldSeed), ...clone(buildingSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
 
   function read(){
     try {

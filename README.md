@@ -34,7 +34,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 | `iot-monitor-center.html` | 云枢 IoT · 设备监控中心 | 单页完整版监控中心，适合单独分享一条链接 |
 | `pages/user.html` | HomeFlow · 全屋智能（用户端） | 家庭视角的设备总览与场景联动：92 台设备 / 10 个房间 / 10 个一键场景 |
 | `pages/china-map.html` | 全国设备分布地图 | 中国地图按**省 / 市 / 县**三级下钻，1000+ 设备按行政区域均匀分布、按状态着色，点设备直达详情 |
-| `pages/device-detail.html` | 设备详情 | 单台设备档案：实时参数、趋势曲线、同站点设备群、健康度与 AI 诊断建议 |
+| `pages/device-detail.html` | 设备详情 | 单台设备档案：实时参数、8 小时趋势、同站点 / 同网关双视角设备群、健康度、AI 诊断与一键生成工单 |
 
 ---
 
@@ -115,7 +115,12 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 ### Device Detail · From Map Pin to Asset
 
 地图上任意设备可直接跳转详情：现场语义（园区 / 厂房 / 家庭）、实时参数、
-趋势曲线、同站点设备群、健康度评分与 AI 诊断建议。
+8 小时趋势、同站点 / 同网关双视角设备群、健康度评分与 AI 诊断建议。
+
+诊断结论按设备状态区分：离线给出故障原因与三步处置建议，状态异常提示
+「仍在上报但通信质量下降」，运行正常则不再挂故障原因。任意设备可
+**一键生成工单**，编号 / 日期 / 类型 / 负责人 / 工时进入本机工单履历，
+并汇总累计单量、未关闭数与平均 MTTR。
 
 <p align="center">
 
@@ -307,7 +312,7 @@ iot-dashboard-demo
 │   ├── maintenance.html        工单与现场处置
 │   ├── user.html               全屋智能用户端（92 台设备 / 10 场景）
 │   ├── china-map.html          全国设备分布地图（省 / 市 / 县三级下钻）
-│   ├── device-detail.html      设备详情（站点 / 家庭 / 厂房 + AI 诊断）
+│   ├── device-detail.html      设备详情（站点 / 家庭 / 厂房 + AI 诊断 + 工单履历）
 │   └── portfolio.html          作品集页
 │
 ├── assets/
