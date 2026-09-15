@@ -56,6 +56,20 @@ function deepLink(){
 /* 延后一点执行：dashboard-enhance.js 会包一层 openDetail 往档案卡片里补「AI 根因分析」按钮 */
 setTimeout(deepLink,120);
 
+/* ── 侧栏高亮跟随页内锚点 ──
+   总览 / 设备 / AI 助手是同一页里的三段，点过去只发生滚动，`.active` 一直钉在「总览」上，
+   看起来像一张静态图。这里只接管以 # 开头的导航项，跨页链接（告警/分析/拓扑…）不动。 */
+function syncNavActive(){
+  const hash=(location.hash||'').replace('#','');
+  document.querySelectorAll('.nav-item').forEach(function(a){
+    const href=a.getAttribute('href')||'';
+    if(href.charAt(0)!=='#')return;
+    a.classList.toggle('active',href.slice(1)===(hash||'overview'));
+  });
+}
+window.addEventListener('hashchange',syncNavActive);
+syncNavActive();
+
 /* ── 场景切换：工业互联网 / 楼宇自控 / 智慧家居 / 全部设备 ── */
 function renderSceneSwitch(){
   const host=document.querySelector('#scene-tabs');if(!host)return;

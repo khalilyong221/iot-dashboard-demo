@@ -36,6 +36,15 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 | `pages/china-map.html` | 全国设备分布地图 | 中国地图按**省 / 市 / 县**三级下钻，1000+ 设备按行政区域均匀分布、按状态着色，点设备直达详情 |
 | `pages/device-detail.html` | 设备详情 | 单台设备档案：实时参数、8 小时趋势、同站点 / 同网关双视角设备群、健康度、AI 诊断与一键生成工单 |
 
+**深链**：设备相关页面都接受 `?device=<设备编号>`，可以直接把一台设备发给别人。例如
+`index.html?device=IOT-0445#ai-section` 会打开该设备的数字档案并展开 AI 根因面板；
+`pages/alerts.html?device=…` / `pages/topology.html?device=…` / `pages/maintenance.html?device=…`
+分别落到事件上下文、影响范围与工单（`device-detail.html` 的主参数是 `?id=`，也兼容 `?device=`）。
+
+**演示案例设备**：`demo.html` 的 8 步动线不写死设备编号，运行时从共享资产模型里挑一台
+当前真正离线、且离线最久的设备。数据一改，动线自动跟着走，不会出现"跟着演示点进去，
+打开的是一台健康设备"。
+
 ---
 
 ## Demo Screenshots
