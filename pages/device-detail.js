@@ -14,7 +14,8 @@
   function P(k) { return q.get(k) || h.get(k); }
   var DEV_ID = P('id') || '';
   var SCENE = P('scene') || 'field';
-  var LOC = (P('loc') || '').split('|').filter(Boolean);
+  /* 地图端用 | 连接三级；同时兼容 / ，便于外部直接粘贴链接 */
+  var LOC = (P('loc') || '').split(/[|/]/).map(function (x) { return x.trim(); }).filter(Boolean);
   var STATUS_TEXT = { online: '运行正常', warning: '状态异常', offline: '离线' };
   var DOMAIN_TEXT = { field: '工业互联网 · 现场设备', building: '楼宇自控 · 机电设备', home: '智慧家居 · 全屋设备' };
   var DOMAIN_ICON = { field: '⌬', building: '⌂', home: '◈' };
@@ -89,12 +90,18 @@
     document.getElementById('dd-id').textContent = d.id;
     document.getElementById('dd-map').href = 'china-map.html?scene=' + encodeURIComponent(SCENE);
 
+    var mapHref = 'china-map.html?scene=' + encodeURIComponent(SCENE);
     var locHtml = '<div class="dd-loc">';
-    var lv = [['省 / 直辖市', LOC[0]], ['地市 / 州', LOC[1]], ['区县', LOC[2]]];
-    lv.forEach(function (row) {
-      locHtml += '<div class="dd-loc-item"><i>' + row[0].slice(0, 1) + '</i><div>' +
-        '<span>' + row[0] + '</span><strong>' + esc(row[1] || '未下沉到该级') + '</strong></div></div>';
-    });
+    if (!LOC.length) {
+      locHtml += '<div class="dd-loc-item"><i>⌖</i><div><span>行政区划</span>' +
+        '<strong>未指定 · 从<a href="' + mapHref + '">全国设备分布地图</a>下钻可自动带入</strong></div></div>';
+    } else {
+      var lv = [['省 / 直辖市', LOC[0]], ['地市 / 州', LOC[1]], ['区县', LOC[2]]];
+      lv.forEach(function (row) {
+        locHtml += '<div class="dd-loc-item"><i>' + row[0].slice(0, 1) + '</i><div>' +
+          '<span>' + row[0] + '</span><strong>' + esc(row[1] || '未下沉到该级') + '</strong></div></div>';
+      });
+    }
     locHtml += '<div class="dd-loc-item"><i>⌬</i><div><span>所属站点</span><strong>' +
       esc(siteName(d)) + '</strong></div></div></div>';
 
