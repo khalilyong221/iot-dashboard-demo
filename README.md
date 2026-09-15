@@ -25,13 +25,14 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 **🌐 https://khalilyong221.github.io/iot-dashboard-demo/**
 
-三个入口页，按用途分开：
+四个入口页，按用途分开：
 
 | 入口 | 页面 | 用途 |
 |---|---|---|
 | `index.html` | 智能运维驾驶舱 | 平台主入口：设备态势、实时事件、健康趋势、AI 运维助手 |
 | `demo.html` | 从异常到知识：一条完整 IoT 运维闭环 | 3 分钟演示路线，顺着异常 → 诊断 → 工单 → 知识沉淀走一遍 |
 | `iot-monitor-center.html` | 云枢 IoT · 设备监控中心 | 单页完整版监控中心，适合单独分享一条链接 |
+| `pages/user.html` | HomeFlow · 全屋智能（用户端） | 家庭视角的设备总览与场景联动：92 台设备 / 10 个房间 / 10 个一键场景 |
 
 ---
 
@@ -61,6 +62,27 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 </p>
 
+### Smart Home User Console
+
+面向家庭用户的设备总览：92 台设备接入、10 个房间分区、能耗与空气质量速览。
+
+<p align="center">
+
+<img src="screenshots/user-hero.jpg" width="850">
+
+</p>
+
+### One-tap Scenes & Cross-device Automation
+
+10 个一键场景（回家 / 离家 / 晚安 / 观影 / 起床 / 会客 / 游戏 / 节能 / 烹饪 / 睡前阅读），
+每个场景驱动多设备联动，并汇总需要关注的设备异常。
+
+<p align="center">
+
+<img src="screenshots/user-scenes.jpg" width="850">
+
+</p>
+
 ---
 
 ## Key Features
@@ -71,6 +93,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 | Digital Twin | Asset topology visualization |
 | AI Diagnosis | Root cause analysis |
 | Maintenance | Knowledge loop |
+| Smart Home Console | 92 devices · 10 scenes · cross-device automation |
 
 ---
 
@@ -89,7 +112,7 @@ The system integrates:
 
 The goal is to transform traditional equipment monitoring into an AI-driven closed-loop operation system.
 
-一个面向工业设备运维场景的 IoT + AI 智能运营平台。
+一个面向工业设备运维场景的 IoT + AI 智能运营平台，另含一条面向家庭用户的全屋智能用户端支线。
 
 核心能力：
 
@@ -235,7 +258,7 @@ iot-dashboard-demo
 │   ├── analytics.html          运营分析
 │   ├── topology.html           数字孪生拓扑
 │   ├── maintenance.html        工单与现场处置
-│   ├── user.html               设备资产档案
+│   ├── user.html               全屋智能用户端（92 台设备 / 10 场景）
 │   └── portfolio.html          作品集页
 │
 ├── assets/
