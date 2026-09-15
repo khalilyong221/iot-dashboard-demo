@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="theme-color" content="#060d17" />
+  <title>设备详情 | IoT Operations Center</title>
+  <link rel="stylesheet" href="device-detail.css" />
+</head>
+
+<body>
+  <div class="dd-shell">
+    <header class="dd-top">
+      <a class="dd-back" href="../index.html">‹ 返回驾驶舱</a>
+      <nav class="dd-crumb" id="dd-crumb"></nav>
+      <div class="dd-tools">
+        <span class="dd-id" id="dd-id">--</span>
+        <a class="dd-btn" id="dd-map" href="china-map.html">在分布地图中查看</a>
+      </div>
+    </header>
+    <main class="dd-body" id="dd-body"></main>
+  </div>
+
+  <script src="../assets/js/shared-data.js"></script>
+  <script src="../assets/vendor/echarts.min.js"></script>
+  <script src="device-detail.js"></script>
+</body>
+
+</html>

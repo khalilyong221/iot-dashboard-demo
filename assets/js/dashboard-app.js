@@ -34,6 +34,8 @@ function renderSceneSwitch(){
   const cur=IoTShared.getScene();
   host.innerHTML=IoTShared.SCENES.map(s=>`<button class="scene-tab${s.key===cur?' active':''}" type="button" data-scene="${s.key}" aria-pressed="${s.key===cur}"><span class="scene-icon">${s.icon}</span><span class="scene-text"><strong>${s.label}</strong><small>${s.sub}</small></span></button>`).join('');
   host.querySelectorAll('.scene-tab').forEach(btn=>btn.addEventListener('click',()=>switchScene(btn.dataset.scene)));
+  /* 全国设备分布地图入口：带上当前场景，进入后地图与驾驶舱保持同一视角 */
+  const g=document.querySelector('#map-global');if(g)g.href='pages/china-map.html?scene='+encodeURIComponent(cur);
 }
 
 function switchScene(key){

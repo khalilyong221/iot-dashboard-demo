@@ -25,7 +25,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 **🌐 https://khalilyong221.github.io/iot-dashboard-demo/**
 
-四个入口页，按用途分开：
+六个入口页，按用途分开：
 
 | 入口 | 页面 | 用途 |
 |---|---|---|
@@ -33,6 +33,8 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 | `demo.html` | 从异常到知识：一条完整 IoT 运维闭环 | 3 分钟演示路线，顺着异常 → 诊断 → 工单 → 知识沉淀走一遍 |
 | `iot-monitor-center.html` | 云枢 IoT · 设备监控中心 | 单页完整版监控中心，适合单独分享一条链接 |
 | `pages/user.html` | HomeFlow · 全屋智能（用户端） | 家庭视角的设备总览与场景联动：92 台设备 / 10 个房间 / 10 个一键场景 |
+| `pages/china-map.html` | 全国设备分布地图 | 中国地图按**省 / 市 / 县**三级下钻，1000+ 设备按行政区域均匀分布、按状态着色，点设备直达详情 |
+| `pages/device-detail.html` | 设备详情 | 单台设备档案：实时参数、趋势曲线、同站点设备群、健康度与 AI 诊断建议 |
 
 ---
 
@@ -83,6 +85,50 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 </p>
 
+### Nationwide Device Map · Province / City / County Drill-down
+
+把 1000+ 台设备铺到中国地图上：全国视角按省份密度着色 + TOP 排行，
+点省份进市级、点城市进区县，设备按在线 / 异常 / 离线三色散点呈现。
+
+<p align="center">
+
+<img src="screenshots/china-map-nation.png" width="850">
+
+</p>
+
+省级视图（以广东省为例）：21 个地市设备散点 + 城市排行 + 设备清单。
+
+<p align="center">
+
+<img src="screenshots/china-map-province.png" width="850">
+
+</p>
+
+市 → 区县下钻（以广州市为例）：11 个区县设备归属一目了然。
+
+<p align="center">
+
+<img src="screenshots/china-map-city.png" width="850">
+
+</p>
+
+### Device Detail · From Map Pin to Asset
+
+地图上任意设备可直接跳转详情：现场语义（园区 / 厂房 / 家庭）、实时参数、
+趋势曲线、同站点设备群、健康度评分与 AI 诊断建议。
+
+<p align="center">
+
+<img src="screenshots/china-map-device-card.png" width="850">
+
+</p>
+
+<p align="center">
+
+<img src="screenshots/device-detail.png" width="850">
+
+</p>
+
 ---
 
 ## Key Features
@@ -94,6 +140,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 | AI Diagnosis | Root cause analysis |
 | Maintenance | Knowledge loop |
 | Smart Home Console | 92 devices · 10 scenes · cross-device automation |
+| Geo Drill-down Map | Nationwide device map · province/city/county · 1000+ assets |
 
 ---
 
@@ -259,6 +306,8 @@ iot-dashboard-demo
 │   ├── topology.html           数字孪生拓扑
 │   ├── maintenance.html        工单与现场处置
 │   ├── user.html               全屋智能用户端（92 台设备 / 10 场景）
+│   ├── china-map.html          全国设备分布地图（省 / 市 / 县三级下钻）
+│   ├── device-detail.html      设备详情（站点 / 家庭 / 厂房 + AI 诊断）
 │   └── portfolio.html          作品集页
 │
 ├── assets/
@@ -274,8 +323,12 @@ iot-dashboard-demo
 │   │   ├── ai-operations.js    AI 运维分析
 │   │   ├── knowledge-loop.js   知识闭环
 │   │   └── iot-center.js       监控中心逻辑
+│   ├── data/geo/               行政区划边界数据（35 个 .js，见 build-geo.py）
 │   ├── vendor/echarts.min.js   图表库
 │   └── img/                    README 配图
+│
+├── tools/
+│   └── build-geo.py            行政区划数据构建脚本（抓取 → 抽稀 → 打包）
 │
 ├── docs/                       设计文档
 │   ├── architecture.md

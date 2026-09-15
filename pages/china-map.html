@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <meta name="theme-color" content="#060d17" />
+  <title>全国设备分布地图 · 省市县三级下钻 | IoT Operations Center</title>
+  <link rel="stylesheet" href="china-map.css" />
+</head>
+
+<body>
+  <div class="cn-shell">
+    <header class="cn-top">
+      <a class="cn-back" href="../index.html">‹ 返回驾驶舱</a>
+      <div class="cn-title">
+        <p class="eyebrow">NATIONAL ASSET DISTRIBUTION</p>
+        <h1>全国设备分布地图</h1>
+      </div>
+      <nav class="cn-crumb" id="crumb"></nav>
+      <div class="cn-tools">
+        <div class="cn-seg" id="cn-scene">
+          <button data-scene="field" class="on">工业互联网</button>
+          <button data-scene="building">楼宇自控</button>
+          <button data-scene="home">智慧家居</button>
+          <button data-scene="all">全域设备</button>
+        </div>
+        <div class="cn-seg small" id="cn-filter">
+          <button data-status="all" class="on">全部</button>
+          <button data-status="online">在线</button>
+          <button data-status="warning">异常</button>
+          <button data-status="offline">离线</button>
+        </div>
+        <button class="cn-tbtn" id="cn-up" disabled>↑ 上一级</button>
+        <button class="cn-tbtn" id="cn-reset">⟲ 重置视图</button>
+      </div>
+    </header>
+
+    <div class="cn-body">
+      <div class="cn-stage">
+        <div id="cn-map"></div>
+        <div class="cn-legend">
+          <span><i style="background:#34d399"></i>在线</span>
+          <span><i style="background:#fbbf24"></i>异常</span>
+          <span><i style="background:#ff5f6d"></i>离线</span>
+          <span class="cn-ramp"><em>设备密度</em><b></b></span>
+        </div>
+        <div class="cn-tip" id="cn-tip">正在加载全国行政区划边界…</div>
+        <div class="cn-card" id="cn-card" hidden></div>
+      </div>
+
+      <aside class="cn-side">
+        <section class="cn-panel" id="cn-summary"></section>
+        <section class="cn-panel" id="cn-rank"></section>
+        <section class="cn-panel scroll" id="cn-devices"></section>
+      </aside>
+    </div>
+  </div>
+
+  <script src="../assets/js/shared-data.js"></script>
+  <script src="../assets/vendor/echarts.min.js"></script>
+  <script src="china-map.js"></script>
+</body>
+
+</html>
