@@ -19,6 +19,13 @@
       </div>
       <nav class="cn-crumb" id="crumb"></nav>
       <div class="cn-tools">
+        <div class="cn-search">
+          <span class="cn-search-ico">⌕</span>
+          <input id="cn-search-input" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="搜设备编号 / 名称，如 IOT-0004" />
+          <button class="cn-search-x" id="cn-search-x" hidden aria-label="清空">×</button>
+          <div class="cn-search-pop" id="cn-search-pop" hidden></div>
+        </div>
         <div class="cn-seg" id="cn-scene">
           <button data-scene="field" class="on">工业互联网</button>
           <button data-scene="building">楼宇自控</button>
@@ -32,7 +39,7 @@
           <button data-status="offline">离线</button>
         </div>
         <button class="cn-tbtn" id="cn-up" disabled>↑ 上一级</button>
-        <button class="cn-tbtn" id="cn-reset">⟲ 重置视图</button>
+        <button class="cn-tbtn" id="cn-reset">⟲ 重置视图</button><button class="cn-tbtn" id="cn-export">⤓ 导出视图</button>
       </div>
     </header>
 

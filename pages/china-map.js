@@ -482,7 +482,10 @@
       '<div class="cn-sum-cell"><span>在线</span><strong style="color:#34d399">' + on + '</strong><small>' + rate + '% 在线率</small></div>' +
       '<div class="cn-sum-cell"><span>异常</span><strong style="color:#fbbf24">' + warn + '</strong><small>需关注</small></div>' +
       '<div class="cn-sum-cell"><span>离线</span><strong style="color:#ff7c82">' + off + '</strong><small>待恢复</small></div>' +
-      '</div>';
+      '</div>' +
+      statusBar(on, warn, off, total) +
+      '<div class="cn-sum-foot"><span>在线率 <b style="color:#34d399">' + rate + '%</b></span>' +
+      '<span>异常率 <b style="color:#fbbf24">' + (total ? ((warn + off) / total * 100).toFixed(1) : '0.0') + '%</b></span></div>';
   }
 
   function renderRank(ctx) {
@@ -501,7 +504,8 @@
         '<span class="cn-rank-no">' + String(i + 1).padStart(2, '0') + '</span>' +
         '<div class="cn-rank-main"><div class="cn-rank-name"><strong>' + r.name + '</strong>' +
         '<em class="' + cls + '">' + c.total + ' 台 · ' + onlineRate + '%</em></div>' +
-        '<div class="cn-rank-bar"><i style="width:' + Math.max(3, Math.round(c.total / max * 100)) + '%"></i></div></div>' +
+        '<div class="cn-rank-bar"><i style="width:' + Math.max(3, Math.round(c.total / max * 100)) + '%"></i></div>' +
+        statusBar(c.online, c.warning, c.offline, c.total) + '</div>' +
         (r.children ? '<span class="cn-rank-arrow">›</span>' : '') +
         '</div>';
     });
@@ -706,6 +710,124 @@
     state.active = null;
   }
 
+  /* ────────────────────────────── 异常聚合条 / 范围名 ────────────────────────────── */
+  /* 每个区域下面挂一条三段比例条（在线 / 异常 / 离线），让「问题集中在哪」一眼可见 */
+  function barSeg(n, total, cls) {
+    var t = total || 1, w = (n || 0) / t * 100;
+    return w > 0 ? '<i class="' + cls + '" style="width:' + w.toFixed(2) + '%"></i>' : '';
+  }
+  function statusBar(on, warn, off, total) {
+    return '<div class="cn-status-bar">' + barSeg(on, total, 'on') +
+      barSeg(warn, total, 'warn') + barSeg(off, total, 'off') + '</div>';
+  }
+  function scopeName() {
+    if (state.level === 0) return '全国';
+    if (state.level === 1) return (state.path[0] && state.path[0].name) || '省级';
+    return (state.path[1] && state.path[1].name) || '市级';
+  }
+
+  /* ────────────────────────────── 设备搜索（跨层级直达） ────────────────────────────── */
+  function matchDevices(key, limit) {
+    var k = String(key || '').trim();
+    if (!k) return [];
+    var up = k.toUpperCase();
+    var list = state.devices || [];
+    var exact = list.filter(function (d) { return String(d.id).toUpperCase() === up; });
+    var byId = list.filter(function (d) { return String(d.id).toUpperCase().indexOf(up) >= 0; });
+    var byName = list.filter(function (d) { return String(d.name || '').indexOf(k) >= 0; });
+    var seen = {}, out = [];
+    exact.concat(byId, byName).forEach(function (d) {
+      if (seen[d.id]) return; seen[d.id] = 1; out.push(d);
+    });
+    return limit ? out.slice(0, limit) : out;
+  }
+
+  function renderSearchPop(q) {
+    var pop = document.getElementById('cn-search-pop');
+    var xb = document.getElementById('cn-search-x');
+    if (!pop) return;
+    var key = String(q || '').trim();
+    if (xb) xb.hidden = !key;
+    if (!key) { pop.hidden = true; pop.innerHTML = ''; return; }
+    var hits = matchDevices(key, 8);
+    if (!hits.length) {
+      pop.innerHTML = '<div class="cn-search-empty">未找到匹配设备</div>';
+      pop.hidden = false;
+      return;
+    }
+    pop.innerHTML = hits.map(function (d, i) {
+      return '<div class="cn-search-item" data-id="' + d.id + '">' +
+        '<span class="cn-search-idx">' + (i + 1) + '</span>' +
+        '<i class="cn-dev-dot ' + d.status + '"></i>' +
+        '<div><strong>' + d.name + '</strong><small>' + d.id + ' · ' + n2(d.type) +
+        ' · ' + n2(d.gateway) + '</small></div>' +
+        '<span class="cn-search-badge ' + d.status + '">' + (STATUS_TEXT[d.status] || d.status) + '</span></div>';
+    }).join('');
+    pop.hidden = false;
+    pop.querySelectorAll('.cn-search-item').forEach(function (el) {
+      el.addEventListener('click', function () {
+        var id = el.getAttribute('data-id');
+        closeSearch();
+        locateDevice(id);
+      });
+    });
+  }
+
+  function closeSearch() {
+    var pop = document.getElementById('cn-search-pop');
+    var inp = document.getElementById('cn-search-input');
+    var xb = document.getElementById('cn-search-x');
+    if (pop) { pop.hidden = true; pop.innerHTML = ''; }
+    if (inp) inp.value = '';
+    if (xb) xb.hidden = true;
+  }
+
+  /* 从全国一路下钻到该设备所在的省 / 市 / 区县，再打开设备卡片 */
+  async function locateDevice(idOrName) {
+    var key = String(idOrName || '').trim();
+    if (!key) return null;
+    var hit = matchDevices(key, 1)[0];
+    if (!hit) {
+      var tip = document.getElementById('cn-tip');
+      if (tip) tip.textContent = '未找到设备「' + key + '」';
+      return null;
+    }
+    if (!state.provAssign[hit.id]) assignProvinces();
+    var a = state.provAssign[hit.id];
+    if (a && a.adcode && (!state.path[0] || String(state.path[0].adcode) !== String(a.adcode))) {
+      await gotoProvince(String(a.adcode));
+    }
+    if (hit._city && state.level === 1) {
+      await gotoCity(String(hit._city));
+    }
+    render();
+    openCard(hit);
+    var row = document.querySelector('.cn-dev-row[data-id="' + hit.id + '"]');
+    if (row) {
+      row.classList.add('flash');
+      row.scrollIntoView({ block: 'center' });
+      setTimeout(function () { row.classList.remove('flash'); }, 1600);
+    }
+    return hit;
+  }
+
+  /* ────────────────────────────── 导出当前视图 ────────────────────────────── */
+  function exportImage() {
+    if (!chart) return;
+    try {
+      var url = chart.getDataURL({ type: 'png', pixelRatio: 2, backgroundColor: '#060d17' });
+      var a = document.createElement('a');
+      a.href = url;
+      var d = new Date();
+      var stamp = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+      a.download = '全国设备分布-' + scopeName() + '-' + stamp + '.png';
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } catch (e) {
+      var tip = document.getElementById('cn-tip');
+      if (tip) tip.textContent = '导出失败：' + (e && e.message ? e.message : e);
+    }
+  }
+
   /* ────────────────────────────── 交互绑定 ────────────────────────────── */
   function bind() {
     chart.on('click', function (p) {
@@ -740,6 +862,29 @@
         render();
       });
     });
+    var sInp = document.getElementById('cn-search-input');
+    if (sInp) {
+      sInp.addEventListener('input', function () { renderSearchPop(sInp.value); });
+      sInp.addEventListener('focus', function () { if (sInp.value) renderSearchPop(sInp.value); });
+      sInp.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          if (sInp.value.trim()) { closeSearch(); locateDevice(sInp.value); }
+          e.preventDefault();
+        } else if (e.key === 'Escape') {
+          closeSearch();
+          e.stopPropagation();
+        }
+      });
+    }
+    var sX = document.getElementById('cn-search-x');
+    if (sX) sX.addEventListener('click', closeSearch);
+    document.addEventListener('click', function (e) {
+      var wrap = document.querySelector('.cn-search');
+      if (wrap && !wrap.contains(e.target)) closeSearch();
+    });
+    var exBtn = document.getElementById('cn-export');
+    if (exBtn) exBtn.addEventListener('click', exportImage);
+
     document.addEventListener('keydown', function (e) {
       if (e.key === 'Escape') { if (state.active) closeCard(); else goto(Math.max(0, state.level - 1)); }
     });
@@ -809,5 +954,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
   else boot();
 
-  window.ChinaMap = { goto: goto, gotoProvince: gotoProvince, gotoCity: gotoCity, openCard: openCard, closeCard: closeCard, state: state, render: render };
+  window.ChinaMap = { goto: goto, gotoProvince: gotoProvince, gotoCity: gotoCity, openCard: openCard, closeCard: closeCard, locateDevice: locateDevice, exportImage: exportImage, search: matchDevices, state: state, render: render };
 })();
