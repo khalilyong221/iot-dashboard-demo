@@ -10,6 +10,12 @@ Digital Twin · Incident Intelligence · Knowledge Loop<br>
 
 <p align="center">
 
+**简体中文** | [English](README.en.md)
+
+</p>
+
+<p align="center">
+
 **🌐 [在线预览](https://khalilyong221.github.io/iot-dashboard-demo/) ·
 [3 分钟演示动线](https://khalilyong221.github.io/iot-dashboard-demo/demo.html)**
 
@@ -300,6 +306,9 @@ Knowledge Loop
 
 ```text
 iot-dashboard-demo
+│
+├── README.md                   中文版（默认渲染）
+├── README.en.md                English version
 │
 ├── index.html                  平台主入口 · 智能运维驾驶舱
 ├── demo.html                   3 分钟演示路线
