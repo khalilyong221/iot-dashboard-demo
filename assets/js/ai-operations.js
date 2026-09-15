@@ -30,9 +30,9 @@
     $('#ai-actions').innerHTML=r.actions.map((x,i)=>`<div class="ai-action"><span>0${i+1}</span><b>${esc(x)}</b></div>`).join('');
     $('#ai-history').innerHTML=`<div class="history-title">HISTORICAL CASES / KNOWLEDGE LOOP</div><div class="history-card"><strong>${kb.count} 起</strong><span>区域 / 根因相似案例</span><b>${kb.causeCount} 起</b><span>相同根因案例</span><b>${kb.avgMttr||'--'} min</b><span>历史平均修复时间</span></div><p class="history-note">${kb.causeCount?`历史案例显示“${esc(r.primary)}”已有 ${kb.causeCount} 起记录，AI 将优先参考已验证处置方案。`:'暂无同根因闭环记录，本次处置结果将沉淀为新的知识。'}</p>`;
     $('#ai-evidence').innerHTML=`<span>Evidence</span><b>RSSI ${d.rssi??'--'} dBm</b><b>Temp ${d.temperature==null?'--':d.temperature+'°C'}</b><b>Last seen ${d.minutesSinceSeen??0} min</b><b>Health ${Math.max(0,100-score(d))}%</b>`;
-    $('#ai-topology').onclick=()=>location.href=`topology.html?device=${encodeURIComponent(d.id)}`;
-    $('#ai-alerts').onclick=()=>location.href=`alerts.html?device=${encodeURIComponent(d.id)}`;
-    $('#ai-workorder').onclick=()=>{localStorage.setItem('iot-pending-workorder',JSON.stringify({deviceId:d.id,deviceName:d.name,zone:d.zone,gateway:d.gateway||'',priority:d.status==='offline'?'P1':'P2',reason:r.primary,createdAt:Date.now()}));location.href=`maintenance.html?device=${encodeURIComponent(d.id)}&from=ai`};
+    $('#ai-topology').onclick=()=>location.href=`../../pages/topology.html?device=${encodeURIComponent(d.id)}`;
+    $('#ai-alerts').onclick=()=>location.href=`../../pages/alerts.html?device=${encodeURIComponent(d.id)}`;
+    $('#ai-workorder').onclick=()=>{localStorage.setItem('iot-pending-workorder',JSON.stringify({deviceId:d.id,deviceName:d.name,zone:d.zone,gateway:d.gateway||'',priority:d.status==='offline'?'P1':'P2',reason:r.primary,createdAt:Date.now()}));location.href=`../../pages/maintenance.html?device=${encodeURIComponent(d.id)}&from=ai`};
     $('#ai-confirm').onclick=()=>{localStorage.setItem('iot-ai-confirmed',JSON.stringify({deviceId:d.id,rootCause:r.primary,at:Date.now()}));$('#ai-toast').textContent=`已确认：${r.primary}。处置完成后将自动沉淀为历史知识。`};
     p.classList.remove('hidden');
   }
