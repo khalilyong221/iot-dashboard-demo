@@ -107,7 +107,7 @@ function cardHTML(d){
   else if (SWITCHABLE.includes(d.type) && d.type !== 'curtain')
     action = '<button class="mini-control ' + (d.on ? 'active' : '') + '" data-action="toggle">' + (d.on ? '◉' : '○') + '</button>' + open;
   return '<article class="device-card" data-id="' + d.id + '">' +
-    '<div class="device-head"><div class="device-icon">' + (ICONS[d.type] || d.icon || '◉') + '</div>' + state + '</div>' +
+    '<div class="device-head"><div class="device-icon">' + (d.icon || ICONS[d.type] || '◉') + '</div>' + state + '</div>' +
     '<h3>' + d.name + '</h3><p>' + d.desc + '</p>' +
     '<div class="device-reading"><strong>' + r.v + '</strong><span>' + r.l + '</span></div>' +
     '<div class="device-actions">' + action + '</div></article>';
@@ -147,7 +147,7 @@ function quick(d, action){
 function openDevice(d){
   if (!d) return;
   active = d;
-  $('#modal-icon').textContent = ICONS[d.type] || d.icon || '◉';
+  $('#modal-icon').textContent = d.icon || ICONS[d.type] || '◉';
   $('#modal-room').textContent = d.room;
   $('#modal-name').textContent = d.name;
   $('#modal-desc').textContent = d.desc;
