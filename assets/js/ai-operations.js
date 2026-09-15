@@ -1,7 +1,7 @@
 (() => {
   const $=s=>document.querySelector(s);
   const esc=s=>String(s??'').replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]||c));
-  const devices=()=>window.IoTShared?.getFieldDevices?.()||[];
+  const devices=()=>window.IoTShared?.getSceneDevices?.()||[];
   const getDevice=id=>devices().find(d=>d.id===id)||null;
   const score=d=>Math.round((d.status==='offline'?48:d.status==='warning'?26:4)+Math.max(0,(-65-(d.rssi||-55))*1.4)+((d.restartCount||0)*4));
   function diagnosis(d){

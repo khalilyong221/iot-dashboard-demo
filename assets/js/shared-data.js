@@ -1,5 +1,5 @@
 const IoTShared = (() => {
-  const storageKey = 'iot-dashboard-shared-model-v3';
+  const storageKey = 'iot-dashboard-shared-model-v4';
 
   const HOME_ROOMS = ['客厅','餐厅','主卧','次卧','书房','厨房','卫生间','阳台','玄关','全屋'];
 
@@ -117,6 +117,111 @@ const IoTShared = (() => {
     { id:'U-092', name:'空气能热水机',    room:'全屋',   type:'waterheater',icon:'◐', desc:'全屋热水 · 水箱 55°C',         on:true,  temp:55 }
   ].map(d => Object.assign({ domain:'home', online:true, alert:false }, d));
 
+  /* ── 楼宇自控（BMS）：商业楼宇暖通与机电设备 ── */
+  const BUILDING_ZONES = ['B1 冷冻机房','1F 大堂','2F 办公区','3F 会议中心','4F 数据中心','RF 屋顶'];
+
+  const buildingGatewayByZone = {
+    'B1 冷冻机房':'BMS-B1',
+    '1F 大堂':'BMS-1F',
+    '2F 办公区':'BMS-2F',
+    '3F 会议中心':'BMS-3F',
+    '4F 数据中心':'BMS-4F',
+    'RF 屋顶':'BMS-RF'
+  };
+
+  const BUILDING_TYPES = ['空调机组 AHU','新风机组','冷冻水泵','冷却塔','电梯','照明回路','智能电表','风机盘管','温湿度传感器','变频器'];
+
+  const buildingSeed = Array.from({ length: 180 }, (_, index) => {
+    const number = String(index + 1).padStart(4, '0');
+    const type = BUILDING_TYPES[index % BUILDING_TYPES.length];
+    const zone = BUILDING_ZONES[index % BUILDING_ZONES.length];
+    // 楼宇机电可用率高于工业现场：离线约占 8%
+    const ladder = [
+      { status:'online',  minutes:index % 3 },
+      { status:'online',  minutes:index % 2 },
+      { status:'warning', minutes:3 + (index % 6) },
+      { status:'online',  minutes:index % 4 },
+      { status:'offline', minutes:14 + (index % 40) }
+    ];
+    const pattern = ladder[index % ladder.length];
+    const reasons = [
+      ['DDC 控制器失联','现场 DDC 未按时返回心跳，可能是控制器断电或总线短路。'],
+      ['通信总线抖动','BACnet 总线误码率升高，建议检查终端电阻与线缆屏蔽层接地。'],
+      ['冷冻水流量不足','机组进出水温差异常，可能是水泵频率偏低或过滤器堵塞。'],
+      ['传感器读数漂移','温湿度读数与相邻点位偏差超阈值，建议现场校准。']
+    ];
+    const reason = reasons[index % reasons.length];
+    const hasTemp = !['电梯','照明回路','智能电表','变频器'].includes(type);
+    const mains = type === '电梯' || type === '照明回路';
+    return {
+      id:`BMS-${number}`,
+      name:`${zone.split(' ')[0]} ${type} ${String((index % 30) + 1).padStart(2, '0')}`,
+      domain:'building',
+      type,
+      zone,
+      gateway:buildingGatewayByZone[zone],
+      protocol:['BACnet/IP','Modbus RTU','KNX','MQTT','LonWorks'][index % 5],
+      firmware:`v${2 + (index % 2)}.${index % 6}.${index % 9}`,
+      status:pattern.status,
+      signal:pattern.status === 'offline' ? '--' : pattern.status === 'warning' ? '较弱' : '良好',
+      rssi:pattern.status === 'offline' ? null : -52 - (index % 36),
+      temperature:hasTemp ? +(18 + (index % 120) / 10).toFixed(1) : null,
+      minutesSinceSeen:pattern.minutes,
+      x:9 + ((index * 23) % 82),
+      y:12 + ((index * 41) % 74),
+      offlineReason:reason[0],
+      offlineReasonDetail:reason[1],
+      battery:mains ? 100 : 46 + ((index * 11) % 54),
+      restartCount:index % 4,
+      history:Array.from({length:8}, (_, i) => ({ time:`${8 + i}:00`, temperature:hasTemp ? +(18 + ((index + i * 4) % 110) / 10).toFixed(1) : null }))
+    };
+  });
+
+  /* ── 家居设备 → 运维视角字段适配（供驾驶舱按场景查看） ── */
+  const HOME_TYPE_CN = {
+    aircon:'空调', light:'灯光', curtain:'窗帘', tv:'电视', console:'游戏主机', av:'影音',
+    camera:'摄像头', hub:'网关中枢', sensor:'传感器', lock:'智能锁', health:'健康设备',
+    alarm:'报警器', appliance:'厨房家电', waterheater:'热水器', toilet:'智能马桶', fan:'风扇',
+    irrigation:'灌溉', outdoor:'户外', heating:'地暖', freshair:'新风', air:'空气净化',
+    humidifier:'加湿器', vacuum:'扫地机', meter:'计量表', power:'能源设备', pet:'宠物设备'
+  };
+
+  function toOpsShape(d, index){
+    const i = index || 0;
+    const offline = d.online === false;
+    const warn = !offline && d.alert === true;
+    const status = offline ? 'offline' : warn ? 'warning' : 'online';
+    const hasTemp = typeof d.temp === 'number' && d.type !== 'waterheater';
+    return {
+      id:d.id,
+      name:d.name,
+      domain:'home',
+      type:HOME_TYPE_CN[d.type] || d.type,
+      zone:d.room,
+      gateway:'HOME-GW-' + String(1 + (i % 3)).padStart(2, '0'),
+      protocol:['Zigbee 3.0','Matter over Wi-Fi','Thread','蓝牙 Mesh'][i % 4],
+      firmware:`v1.${i % 5}.${i % 9}`,
+      status,
+      signal:offline ? '--' : warn ? '较弱' : '良好',
+      rssi:offline ? null : -46 - (i % 34),
+      temperature:hasTemp ? d.temp : null,
+      minutesSinceSeen:offline ? 12 + (i % 40) : i % 3,
+      x:8 + ((i * 19) % 84),
+      y:10 + ((i * 29) % 76),
+      offlineReason:offline ? '网关未上报心跳' : warn ? '设备状态异常' : '',
+      offlineReasonDetail:offline
+        ? '该设备所属智能网关没有返回心跳，常见原因是网关断电或家庭网络中断。'
+        : warn ? '设备上报了异常状态，可在用户端页面查看具体读数与建议。' : '',
+      battery:(d.type === 'light' || d.type === 'aircon') ? 100 : 42 + ((i * 13) % 58),
+      restartCount:i % 2,
+      history:Array.from({length:8}, (_, k) => ({
+        time:`${8 + k}:00`,
+        temperature:hasTemp ? +(d.temp + ((k % 3) - 1) * 0.4).toFixed(1) : null
+      })),
+      _home:true
+    };
+  }
+
   const gatewayByZone = {
     'A 区温室':'Gateway-A03',
     'B 区冷库':'Gateway-B02',
@@ -169,7 +274,7 @@ const IoTShared = (() => {
   });
 
   const clone = value => structuredClone(value);
-  const defaults = () => ({ version:3, devices:[...clone(fieldSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
+  const defaults = () => ({ version:4, devices:[...clone(fieldSeed), ...clone(buildingSeed), ...clone(homeSeed)], updatedAt:Date.now(), revision:1 });
 
   function read(){
     try {
@@ -236,6 +341,50 @@ const IoTShared = (() => {
   function updateFieldDevice(id, patch){ return updateDevice(id, patch); }
   function getFieldDevices(){ return getAll('field'); }
   function getHomeDevices(){ return getAll('home'); }
+  function getBuildingDevices(){ return getAll('building'); }
+
+  /* ── 场景（业务线）切换：工业 / 楼宇 / 家居 / 全部 ── */
+  const SCENES = [
+    {
+      key:'field', label:'工业互联网', sub:'园区 A–E 区', icon:'▦',
+      mapTitle:'园区设备态势', zoneLabel:'区域',
+      desc:'温室 / 冷库 / 仓库 / 泵站 / 配电房 · 1000 台逻辑设备 · LoRaWAN / Modbus TCP / NB-IoT / MQTT'
+    },
+    {
+      key:'building', label:'楼宇自控', sub:'商业楼宇 B1–RF', icon:'⌸',
+      mapTitle:'楼宇机电态势', zoneLabel:'楼层',
+      desc:'空调机组 / 新风 / 冷冻水 / 冷却塔 / 电梯 / 照明 · 180 台设备 · BACnet / KNX / Modbus RTU / LonWorks'
+    },
+    {
+      key:'home', label:'智慧家居', sub:'全屋 10 个房间', icon:'⌂',
+      mapTitle:'全屋设备态势', zoneLabel:'房间',
+      desc:'92 台设备 · 空调 / 灯光 / 窗帘 / 影音 / 厨电 / 安防 / 能源 / 网络中枢 · Zigbee / Matter / Thread'
+    },
+    {
+      key:'all', label:'全部设备', sub:'三条业务线合并', icon:'◎',
+      mapTitle:'全平台设备态势', zoneLabel:'分区',
+      desc:'工业 1000 台 + 楼宇 180 台 + 家居 92 台，统一接入同一套运维视图'
+    }
+  ];
+
+  let scene = 'field';
+
+  function getScene(){ return scene; }
+  function getSceneMeta(key){ return SCENES.find(item => item.key === (key || scene)) || SCENES[0]; }
+  function setScene(key){
+    if(SCENES.some(item => item.key === key)) scene = key;
+    const meta = getSceneMeta(key);
+    window.dispatchEvent(new CustomEvent('iot-scene-change', { detail:meta }));
+    return meta;
+  }
+
+  function getSceneDevices(key){
+    const target = key || scene;
+    if(target === 'building') return getAll('building');
+    if(target === 'home') return getAll('home').map((d, i) => toOpsShape(d, i));
+    if(target === 'all') return getAll().map((d, i) => d.domain === 'home' ? toOpsShape(d, i) : d);
+    return getAll('field');
+  }
 
   function reset(){
     const model = defaults();
@@ -249,5 +398,5 @@ const IoTShared = (() => {
     try { window.dispatchEvent(new CustomEvent('iot-model-change', {detail:JSON.parse(event.newValue)})); } catch(error) {}
   });
 
-  return {storageKey, HOME_ROOMS, ensure, read, write, getAll, getDevice, getFieldDevices, getHomeDevices, updateDevice, updateFieldDevice, executeCommand, reset};
+  return {storageKey, HOME_ROOMS, BUILDING_ZONES, BUILDING_TYPES, SCENES, ensure, read, write, getAll, getDevice, getFieldDevices, getBuildingDevices, getHomeDevices, getScene, getSceneMeta, setScene, getSceneDevices, toOpsShape, updateDevice, updateFieldDevice, executeCommand, reset};
 })();

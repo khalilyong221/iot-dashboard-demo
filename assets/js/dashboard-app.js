@@ -2,14 +2,15 @@ const statusText={online:'在线',offline:'离线',warning:'异常'};
 const list=document.querySelector('#device-list'),search=document.querySelector('#search'),statusFilter=document.querySelector('#status-filter');
 const alerts=document.querySelector('#alerts'),map=document.querySelector('#device-map'),modal=document.querySelector('#detail-modal');
 const reasonBox=document.querySelector('#offline-reason'),actionMessage=document.querySelector('#action-message');
-let devices=IoTShared.getFieldDevices(),activeDeviceId=null;
-function safe(fn){try{fn()}catch(e){console.warn('[render]',e)}}function renderAll(){safe(renderSummary);safe(renderMap);safe(renderAlerts);safe(renderTable);safe(renderTelemetry);if(typeof window.renderRisk==='function')safe(window.renderRisk);if(typeof window.renderHealthChart==='function')safe(window.renderHealthChart);if(typeof window.renderEnergy==='function')safe(window.renderEnergy);if(typeof window.enhanceTable==='function')safe(window.enhanceTable);}
-function refreshModel(){devices=IoTShared.getFieldDevices();renderAll();if(activeDeviceId)openDetail(activeDeviceId)}
+try{const q=new URLSearchParams(location.search).get('scene');if(q)IoTShared.setScene(q)}catch(e){}
+let devices=IoTShared.getSceneDevices(),activeDeviceId=null;
+function safe(fn){try{fn()}catch(e){console.warn('[render]',e)}}function renderAll(){safe(renderSceneSwitch);safe(renderMapChrome);safe(renderSummary);safe(renderMap);safe(renderAlerts);safe(renderTable);safe(renderTelemetry);if(typeof window.renderRisk==='function')safe(window.renderRisk);if(typeof window.renderHealthChart==='function')safe(window.renderHealthChart);if(typeof window.renderEnergy==='function')safe(window.renderEnergy);if(typeof window.enhanceTable==='function')safe(window.enhanceTable);}
+function refreshModel(){devices=IoTShared.getSceneDevices();renderAll();if(activeDeviceId)openDetail(activeDeviceId)}
 window.addEventListener('iot-model-change',refreshModel);
 function formatLastSeen(minutes){if(minutes<=0)return '刚刚';if(minutes<60)return `${minutes} 分钟前`;return `${Math.floor(minutes/60)} 小时前`}
 function riskScore(d){let s=d.status==='offline'?88:d.status==='warning'?68:22;if(d.rssi&&d.rssi<-80)s+=9;if(d.battery<20)s+=5;return Math.min(99,s)}
 function renderSummary(){const total=devices.length,online=devices.filter(d=>d.status==='online').length,offline=devices.filter(d=>d.status==='offline').length,warning=devices.filter(d=>d.status==='warning').length,active=devices.filter(d=>d.status!=='online').length;document.querySelector('#total').textContent=total.toLocaleString();document.querySelector('#online').textContent=online.toLocaleString();const offlineEl=document.querySelector('#offline');if(offlineEl)offlineEl.textContent=offline.toLocaleString();document.querySelector('#warning').textContent=warning.toLocaleString();document.querySelector('#timeout').textContent=active.toLocaleString();document.querySelector('#online-rate').textContent=`${((online/total)*100).toFixed(1)}% 在线率`;document.querySelector('#critical-rate').textContent=`${offline} 离线 / ${warning} 异常`;document.querySelector('#nav-alert-count').textContent=active;document.querySelector('#nav-device-count').textContent=total;document.querySelector('#alert-count').textContent=`${active} ACTIVE`;document.querySelector('#last-updated').textContent=new Date().toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',second:'2-digit'});document.querySelector('#network-health').textContent=`${((online/total)*100).toFixed(1)}%`;document.querySelector('#health-bar').style.width=`${(online/total)*100}%`;document.querySelector('#availability').textContent=`${(98.7+((online/total)*1.1)).toFixed(1)}%`;document.querySelector('#map-health').textContent=`网络健康 ${((online/total)*100).toFixed(1)}%`;const critical=devices.filter(d=>d.status==='offline'&&d.minutesSinceSeen>60).length,high=devices.filter(d=>d.status==='offline'&&d.minutesSinceSeen<=60).length,normal=warning;document.querySelector('#sev-critical').textContent=critical;document.querySelector('#sev-high').textContent=high;document.querySelector('#sev-normal').textContent=normal}
-function renderMap(){map.querySelectorAll('.map-pin').forEach(x=>x.remove());devices.filter((_,i)=>i%11===0).forEach(d=>{const pin=document.createElement('button');pin.className=`map-pin ${d.status}`;pin.style.left=`${d.x}%`;pin.style.top=`${d.y}%`;pin.title=`${d.name} · ${statusText[d.status]}`;pin.setAttribute('aria-label',`查看 ${d.name}`);pin.addEventListener('click',()=>openDetail(d.id));map.appendChild(pin)})}
+function renderMap(){map.querySelectorAll('.map-pin').forEach(x=>x.remove());const pinStep=Math.max(1,Math.round(devices.length/70));devices.filter((_,i)=>i%pinStep===0).forEach(d=>{const pin=document.createElement('button');pin.className=`map-pin ${d.status}`;pin.style.left=`${d.x}%`;pin.style.top=`${d.y}%`;pin.title=`${d.name} · ${statusText[d.status]}`;pin.setAttribute('aria-label',`查看 ${d.name}`);pin.addEventListener('click',()=>openDetail(d.id));map.appendChild(pin)})}
 function renderAlerts(){const items=devices.filter(d=>d.status!=='online').sort((a,b)=>riskScore(b)-riskScore(a)).slice(0,6);alerts.innerHTML=items.map(d=>`<div class="alert-item ${d.status}" data-id="${d.id}"><div class="alert-icon">${d.status==='offline'?'!':'△'}</div><div><strong>${d.name}</strong><span>${d.zone} · ${d.status==='offline'?formatLastSeen(d.minutesSinceSeen)+' · 超时未上报':'遥测异常 · 风险 '+riskScore(d)+'/100'}</span></div><b class="alert-arrow">›</b></div>`).join('')||'<div class="empty">暂无活动事件</div>';alerts.querySelectorAll('.alert-item').forEach(x=>x.addEventListener('click',()=>openDetail(x.dataset.id)))}
 function signalHTML(d){if(!d.rssi)return '<span>--</span>';const level=Math.max(1,Math.min(5,Math.ceil((d.rssi+100)/10)));return `<div class="signal"><span class="signal-bars">${[1,2,3,4,5].map(i=>`<i style="height:${i*2+3}px;opacity:${i<=level?1:.2}"></i>`).join('')}</span><span>${d.rssi} dBm</span></div>`}
 function batteryHTML(d){if(d.status==='offline')return '--';return `<div class="battery"><span class="battery-track"><i style="width:${d.battery}%"></i></span><span>${d.battery}%</span></div>`}
@@ -26,3 +27,47 @@ function aiAnswer(q){const text=q.toLowerCase();const target=text.match(/[a-z]-?
 function runAI(q){const box=document.querySelector('#ai-result');box.innerHTML='<div class="ai-loading">正在聚合设备状态、网络指标与历史事件……</div>';setTimeout(()=>{box.innerHTML=aiAnswer(q||'找出今天风险最高的设备')},500)}
 document.querySelector('#close-modal').addEventListener('click',()=>{modal.classList.add('hidden');activeDeviceId=null});document.querySelector('#reconnect-btn').addEventListener('click',reconnect);document.querySelector('#restart-btn').addEventListener('click',restart);document.querySelector('#history-btn').addEventListener('click',()=>{const d=getActive();if(d)renderHistory(d)});modal.addEventListener('click',e=>{if(e.target===modal){modal.classList.add('hidden');activeDeviceId=null}});document.addEventListener('keydown',e=>{if(e.key==='Escape'){modal.classList.add('hidden');activeDeviceId=null}});search.addEventListener('input',renderTable);statusFilter.addEventListener('change',renderTable);document.querySelector('#refresh-btn').addEventListener('click',renderAll);document.querySelector('#show-alerts').addEventListener('click',()=>{statusFilter.value='offline';renderTable();document.querySelector('#devices').scrollIntoView({behavior:'smooth'})});document.querySelector('#ai-run').addEventListener('click',()=>runAI(document.querySelector('#ai-input').value));document.querySelector('#ai-input').addEventListener('keydown',e=>{if(e.key==='Enter')runAI(e.target.value)});document.querySelectorAll('[data-prompt]').forEach(b=>b.addEventListener('click',()=>{document.querySelector('#ai-input').value=b.dataset.prompt;runAI(b.dataset.prompt)}));renderAll();
 window.renderAll=renderAll;window.openDetail=openDetail;window.openDeviceDetail=openDetail;
+
+/* ── 场景切换：工业互联网 / 楼宇自控 / 智慧家居 / 全部设备 ── */
+function renderSceneSwitch(){
+  const host=document.querySelector('#scene-tabs');if(!host)return;
+  const cur=IoTShared.getScene();
+  host.innerHTML=IoTShared.SCENES.map(s=>`<button class="scene-tab${s.key===cur?' active':''}" type="button" data-scene="${s.key}" aria-pressed="${s.key===cur}"><span class="scene-icon">${s.icon}</span><span class="scene-text"><strong>${s.label}</strong><small>${s.sub}</small></span></button>`).join('');
+  host.querySelectorAll('.scene-tab').forEach(btn=>btn.addEventListener('click',()=>switchScene(btn.dataset.scene)));
+}
+
+function switchScene(key){
+  if(key===IoTShared.getScene())return;
+  IoTShared.setScene(key);
+  try{const u=new URL(location.href);u.searchParams.set('scene',key);history.replaceState(null,'',u)}catch(e){}
+  activeDeviceId=null;
+  if(modal)modal.classList.add('hidden');
+  const searchEl=document.querySelector('#search'),filterEl=document.querySelector('#status-filter');
+  if(searchEl)searchEl.value='';
+  if(filterEl)filterEl.selectedIndex=0;
+  refreshModel();
+}
+
+function renderMapChrome(){
+  const meta=IoTShared.getSceneMeta();
+  const title=document.querySelector('#map-title');if(title)title.textContent=meta.mapTitle;
+  const desc=document.querySelector('#scene-desc');if(desc)desc.textContent=meta.desc;
+  if(!map)return;
+  map.querySelectorAll('.zone-label').forEach(el=>el.remove());
+  const zones=[],gws=[];
+  devices.forEach(d=>{if(d.zone&&zones.indexOf(d.zone)<0)zones.push(d.zone);if(d.gateway&&gws.indexOf(d.gateway)<0)gws.push(d.gateway)});
+  const cols=Math.max(2,Math.ceil(Math.sqrt(zones.length))),rows=Math.max(1,Math.ceil(zones.length/cols));
+  zones.forEach((z,i)=>{
+    const el=document.createElement('div');
+    el.className='zone-label';
+    el.textContent=z;
+    el.style.left=(7+(i%cols)*(86/cols)).toFixed(2)+'%';
+    el.style.top=(9+Math.floor(i/cols)*(72/rows)).toFixed(2)+'%';
+    map.appendChild(el);
+  });
+  const zoneEl=document.querySelector('#map-zones');if(zoneEl)zoneEl.textContent='● '+zones.length+' 个'+meta.zoneLabel;
+  const gwEl=document.querySelector('#map-gateways');if(gwEl)gwEl.textContent='● '+gws.length+' 个网关';
+  const totalEl=document.querySelector('#map-total');if(totalEl)totalEl.textContent='● '+devices.length.toLocaleString()+' 个逻辑设备';
+}
+
+window.renderSceneSwitch=renderSceneSwitch;window.switchScene=switchScene;

@@ -1,7 +1,7 @@
 (() => {
   const $ = (s) => document.querySelector(s);
   const escapeHtml = (s) => String(s).replace(/[&<>'\"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[c]));
-  const getDevices = () => IoTShared.getFieldDevices();
+  const getDevices = () => IoTShared.getSceneDevices();
   const riskScore = d => Math.round((d.status==='offline'?48:d.status==='warning'?26:4) + Math.max(0,(-65-(d.rssi||-55))*1.4) + Math.max(0,(35-(d.temperature||26))*0.05) + ((d.restartCount||0)*4));
   function enhanceTable(){
     const rows = document.querySelectorAll('#device-list tr[data-id]');
