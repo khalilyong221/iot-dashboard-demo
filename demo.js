@@ -1,6 +1,7 @@
 (() => {
   const steps=[
     '“我先从总览看系统健康度，再从风险设备进入事件上下文。”',
+    '“需要判断是区域性问题还是单点故障时，我会打开全国分布地图，按省市县下钻，看异常设备在空间上的聚集。”',
     '“这里不是简单的设备列表，我会进入数字档案，把设备状态、信号和最近遥测放在同一个上下文里。”',
     '“接下来进入事件中心，把异常从一个红点变成有等级、有证据、有生命周期的 Incident。”',
     '“AI 在这里不是聊天装饰，而是基于 RSSI、温度、网关关系和历史案例给出根因假设。”',
@@ -17,7 +18,7 @@
     $('#talk-text').textContent=steps[current];
     $('#next-step').textContent=current===steps.length-1?'重新开始 ↺':'下一步 →';
     const d=device();$('#case-device').textContent=d.id;$('#case-meta').textContent=`${d.name} · ${d.zone} · ${d.gateway||'Gateway'} · ${d.status==='offline'?'离线异常':'状态异常'}`;
-    $('#case-status').textContent=`当前步骤 ${current+1}/7 · ${['态势','资产','事件','AI','拓扑','处置','知识'][current]}`;
+    $('#case-status').textContent=`当前步骤 ${current+1}/8 · ${['态势','分布','资产','事件','AI','拓扑','处置','知识'][current]}`;
   }
   $('#next-step').addEventListener('click',()=>{current=(current+1)%steps.length;render();window.scrollTo({top:document.querySelector('.steps').offsetTop-24,behavior:'smooth'});});
   all().forEach((el,i)=>el.addEventListener('click',e=>{if(e.target.closest('a'))return;current=i;render();}));
