@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>architecture source</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}
+  html,body{width:1600px;height:920px;background:#060d17;overflow:hidden}
+  .wrap{width:100%;height:100%;padding:46px 54px;display:flex;flex-direction:column;gap:24px;
+        background:radial-gradient(1000px 460px at 92% 0%, rgba(61,165,245,.13), transparent 72%), #060d17}
+  .head{display:flex;align-items:flex-end;justify-content:space-between;
+        padding-bottom:20px;border-bottom:1px solid #16293b}
+  .head .eyebrow{font-size:12px;letter-spacing:4px;color:#4eafff;font-weight:800}
+  .head h1{margin:12px 0 0;font-size:40px;letter-spacing:1px;color:#f2f7fd;font-weight:900}
+  .head p{margin-top:12px;font-size:14px;color:#6b8299;letter-spacing:.6px}
+  .head .right{text-align:right;font-size:12.5px;line-height:2;color:#5c7488;letter-spacing:1.2px}
+
+  .lay{display:flex;gap:20px;align-items:stretch}
+  .no{width:50px;flex:none;display:flex;flex-direction:column;align-items:center;gap:9px}
+  .no b{width:42px;height:42px;flex:none;display:grid;place-items:center;border:1px solid #2c5a83;
+        border-radius:11px;background:#0d1f31;color:#74bcff;font-size:17px;font-weight:900}
+  .no i{flex:1;width:1px;background:linear-gradient(#1c3145,#0f1f2e)}
+  .card{flex:1;border:1px solid #17283a;border-radius:12px;background:linear-gradient(145deg,#0c1725,#0a1420);padding:22px 24px}
+  .card>h2{font-size:16px;color:#cfe0f0;font-weight:800;letter-spacing:1.4px}
+  .card>h2 em{font-style:normal;margin-left:11px;font-size:11.5px;letter-spacing:2px;color:#4d6a86;font-weight:700}
+  .card>p{margin-top:10px;font-size:13.5px;line-height:1.75;color:#6f879e}
+
+  .chips{margin-top:16px;display:flex;flex-wrap:wrap;gap:9px}
+  .chip{padding:9px 13px;border:1px solid #1c3145;border-radius:9px;background:#0a1521;
+        color:#a8bdd1;font-size:13.5px;font-weight:700}
+  .chip.on{border-color:#2f7fd0;background:linear-gradient(135deg,#12324f,#0d2237);color:#e9f4ff}
+  .chip small{display:block;margin-top:5px;font-size:11.5px;color:#5f7c98;font-weight:600;letter-spacing:.4px}
+  .chip.on small{color:#7fa8ca}
+  .sep{width:1px;align-self:stretch;background:#17283a;margin:0 3px}
+
+  .loop{margin-top:17px;display:flex;align-items:center;gap:11px}
+  .step{flex:1;border:1px solid #1c3145;border-radius:10px;background:#0a1624;padding:14px 15px}
+  .step b{display:block;font-size:14px;color:#dbe7f2;font-weight:800}
+  .step span{display:block;margin-top:7px;font-size:12px;line-height:1.6;color:#5f7c98}
+  .step.g{border-color:#1f5a48;background:#081a15}
+  .step.g b{color:#7ff0c0}
+  .arw{flex:none;color:#2f7fd0;font-size:18px;font-weight:900}
+
+  .kv{margin-top:17px;display:grid;grid-template-columns:repeat(4,1fr);gap:13px}
+  .kv div{border:1px solid #16293b;border-radius:9px;background:#09131f;padding:14px 16px}
+  .kv b{display:block;font-size:17px;color:#e9f4ff;font-weight:900}
+  .kv span{display:block;margin-top:7px;font-size:12px;color:#5c7488;letter-spacing:.4px}
+</style></head>
+<body><div class="wrap">
+
+  <div class="head">
+    <div>
+      <div class="eyebrow">SYSTEM ARCHITECTURE / THIS REPOSITORY</div>
+      <h1>系统架构 · 从设备模型到运维闭环</h1>
+      <p>视图层 → 共享数据模型 → 业务闭环，三端（管理端 / 用户端 / 单页监控中心）共用同一套资产模型</p>
+    </div>
+    <div class="right">
+      无构建步骤 · 纯静态<br>
+      单文件 HTML · 原生 JS<br>
+      一级／二级页面 · 深链 ?device=
+    </div>
+  </div>
+
+  <div class="lay">
+    <div class="no"><b>01</b><i></i></div>
+    <div class="card">
+      <h2>视图层<em>VIEWS</em></h2>
+      <p>驾驶舱、地图、拓扑、告警、分析、维护、设备档案各自独立成页，靠共享模型取数，互不耦合。</p>
+      <div class="chips">
+        <span class="chip on"><span>智能运维驾驶舱</span><small>index.html</small></span>
+        <span class="chip"><span>全国分布地图</span><small>省 / 市 / 县三级下钻</small></span>
+        <span class="chip"><span>资产拓扑</span><small>园区 → 区域 → 网关 → 设备</small></span>
+        <span class="chip"><span>告警中心</span><small>设备上下文深链</small></span>
+        <span class="chip"><span>分析</span><small>健康 · 能耗 · 风险</small></span>
+        <span class="chip"><span>故障维护</span><small>工单状态机</small></span>
+        <span class="chip"><span>设备档案</span><small>实时参数 · 8h 趋势</small></span>
+        <span class="sep"></span>
+        <span class="chip"><span>HomeFlow 用户端</span><small>92 台 · 10 房间 · 10 场景</small></span>
+        <span class="chip"><span>单页监控中心</span><small>一条链接分享</small></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="lay">
+    <div class="no"><b>02</b><i></i></div>
+    <div class="card">
+      <h2>共享数据模型<em>SHARED DATA MODEL</em></h2>
+      <p><b style="color:#a8bdd1">assets/js/shared-data.js</b> — 管理端与用户端共用同一份资产模型：改一处数据，全站视图跟着走。
+        演示态数据全部由确定性伪随机生成（同一份种子 → 同一份结果），不依赖后端即可复现。</p>
+      <div class="kv">
+        <div><b>1,000 台</b><span>接入设备 · 3 个场景域</span></div>
+        <div><b>93.0%</b><span>设备在线率（对齐真实车队）</span></div>
+        <div><b>mulberry32</b><span>确定性伪随机 + 槽位洗牌</span></div>
+        <div><b>localStorage v6</b><span>版本化本机存储 · 工单 / 知识库</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="lay">
+    <div class="no"><b>03</b></div>
+    <div class="card">
+      <h2>业务闭环<em>OPERATIONS LOOP</em></h2>
+      <p>演示动线（demo.html）不写死设备编号：运行时挑一台真正离线且离线最久的设备，串起下面五步。</p>
+      <div class="loop">
+        <div class="step"><b>异常发现</b><span>资产表 / 告警中心<br>按风险分排序</span></div>
+        <div class="arw">→</div>
+        <div class="step"><b>AI 根因分析</b><span>假设排序 + 置信度<br>+ 证据链</span></div>
+        <div class="arw">→</div>
+        <div class="step"><b>工单处置</b><span>P1/P2 · 工时<br>状态机推进</span></div>
+        <div class="arw">→</div>
+        <div class="step g"><b>知识沉淀</b><span>根因 / 方案 / MTTR<br>写入知识库</span></div>
+        <div class="arw">→</div>
+        <div class="step g"><b>反哺下一次诊断</b><span>召回同根因历史案例</span></div>
+      </div>
+    </div>
+  </div>
+
+</div></body></html>

@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>banner source</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{font-family:Inter,"Segoe UI","Microsoft YaHei",sans-serif}
+  html,body{width:1600px;height:600px;background:#060d17;overflow:hidden}
+  .wrap{width:100%;height:100%;padding:52px 64px 44px;display:flex;flex-direction:column;
+        justify-content:space-between;
+        background:
+          radial-gradient(900px 420px at 86% 4%, rgba(61,165,245,.15), transparent 70%),
+          radial-gradient(760px 400px at 2% 100%, rgba(78,196,154,.09), transparent 72%),
+          #060d17}
+  .top{display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:16px}
+  .mark{width:54px;height:54px;display:grid;place-items:center;border:1px solid #315174;
+        border-radius:13px;background:#0d1c2d;color:#66b8ff;font-size:17px;font-weight:900;letter-spacing:-1px}
+  .brand b{display:block;font-size:15px;letter-spacing:2.4px;color:#dce7f5;font-weight:800}
+  .brand span{display:block;margin-top:5px;font-size:10px;letter-spacing:3px;color:#63758b;font-weight:700}
+  .tag{font-size:11px;letter-spacing:3px;color:#4d6a86;font-weight:700}
+
+  .mid .eyebrow{font-size:11px;letter-spacing:4px;color:#4eafff;font-weight:800}
+  .mid h1{margin:16px 0 0;font-size:64px;letter-spacing:3px;color:#f2f7fd;font-weight:900;line-height:1.06}
+  .mid .sub{margin-top:18px;font-size:16px;color:#7b93ab;letter-spacing:1.8px}
+
+  .bot{padding-top:28px;border-top:1px solid #16293b}
+  .stats{display:flex;gap:58px;align-items:flex-end}
+  .stat b{display:block;font-size:36px;color:#e9f4ff;font-weight:900;letter-spacing:-.5px;line-height:1}
+  .stat b i{font-style:normal;font-size:17px;color:#5f7c98;margin-left:3px;font-weight:700}
+  .stat span{display:block;margin-top:9px;font-size:11px;color:#5c7488;letter-spacing:1.4px}
+  .stat.g b{color:#5fe0ae}
+  .chips{margin-top:26px;display:flex;gap:10px}
+  .chip{padding:7px 15px;border:1px solid #1c3145;border-radius:20px;background:#0a1521;
+        color:#8296ad;font-size:11.5px;letter-spacing:.8px;white-space:nowrap}
+</style></head>
+<body><div class="wrap">
+
+  <div class="top">
+    <div class="brand">
+      <div class="mark">IO</div>
+      <div><b>IoT CONTROL</b><span>AI OPERATIONS CENTER</span></div>
+    </div>
+    <div class="tag">PORTFOLIO BUILD · 2026</div>
+  </div>
+
+  <div class="mid">
+    <div class="eyebrow">IOT / OPERATIONS / COMMAND CENTER</div>
+    <h1>智能运维驾驶舱</h1>
+    <div class="sub">设备态势 · 事件闭环 · AI 根因分析 · 知识沉淀</div>
+  </div>
+
+  <div class="bot">
+    <div class="stats">
+      <div class="stat g"><b>93.0<i>%</i></b><span>设备在线率</span></div>
+      <div class="stat"><b>1,000</b><span>接入设备</span></div>
+      <div class="stat"><b>18</b><span>边缘网关</span></div>
+      <div class="stat"><b>10</b><span>可视化视图</span></div>
+    </div>
+    <div class="chips">
+      <span class="chip">工业互联网</span>
+      <span class="chip">楼宇自控</span>
+      <span class="chip">智慧家居</span>
+      <span class="chip">全国分布地图 · 省市县三级</span>
+      <span class="chip">8 步演示闭环</span>
+    </div>
+  </div>
+
+</div></body></html>

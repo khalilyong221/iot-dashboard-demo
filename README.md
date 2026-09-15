@@ -15,7 +15,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="assets/img/banner.jpg" width="100%">
+<img src="assets/img/banner.png" width="100%">
 
 </p>
 
@@ -51,25 +51,34 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 ### IoT Operations Dashboard
 
+1,000 台设备 / 93.0% 在线率，按工业互联网 · 楼宇自控 · 智慧家居 · 全部设备四个场景域切换；
+园区设备态势图、实时事件流、设备资产表与今日运营快照都在同一屏内。
+
 <p align="center">
 
-<img src="screenshots/dashboard.jpg" width="850">
+<img src="screenshots/dashboard.png" width="850">
 
 </p>
 
 ### Digital Twin Topology
 
+园区 → 区域 → 网关 → 设备四级资产树，与力导向拓扑图联动；右侧节点检查器给出
+健康度、在线数与最近信号，底部是影响范围（Blast radius）说明。
+
 <p align="center">
 
-<img src="screenshots/topology.jpg" width="850">
+<img src="screenshots/topology.png" width="850">
 
 </p>
 
 ### AI Diagnosis Assistant
 
+以一台真实离线设备为例：置信度 78%，三条根因假设按概率排序（网关侧连接中断 / 无线覆盖劣化 /
+设备断电），配四条建议动作与证据链，并召回知识库中相同根因 1 起、历史平均 MTTR 14 min 的处置经验。
+
 <p align="center">
 
-<img src="screenshots/ai-diagnosis.jpg" width="850">
+<img src="screenshots/ai-diagnosis.png" width="850">
 
 </p>
 
@@ -79,7 +88,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="screenshots/user-hero.jpg" width="850">
+<img src="screenshots/user-hero.png" width="850">
 
 </p>
 
@@ -90,7 +99,7 @@ Digital Twin · Incident Intelligence · Predictive Maintenance
 
 <p align="center">
 
-<img src="screenshots/user-scenes.jpg" width="850">
+<img src="screenshots/user-scenes.png" width="850">
 
 </p>
 
@@ -190,7 +199,7 @@ The goal is to transform traditional equipment monitoring into an AI-driven clos
 
 <p align="center">
 
-<img src="assets/img/architecture.jpg" width="900">
+<img src="assets/img/architecture.png" width="900">
 
 </p>
 
@@ -342,7 +351,9 @@ iot-dashboard-demo
 │   └── img/                    README 配图
 │
 ├── tools/
-│   └── build-geo.py            行政区划数据构建脚本（抓取 → 抽稀 → 打包）
+│   ├── build-geo.py            行政区划数据构建脚本（抓取 → 抽稀 → 打包）
+│   ├── banner.html             README 头图源文件（无头 Chrome 截图生成 banner.png）
+│   └── architecture.html       架构图源文件（同法生成 architecture.png）
 │
 ├── docs/                       设计文档
 │   ├── architecture.md
